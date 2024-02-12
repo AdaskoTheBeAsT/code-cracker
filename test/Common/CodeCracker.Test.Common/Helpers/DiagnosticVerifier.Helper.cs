@@ -25,6 +25,7 @@ namespace CodeCracker.Test
         private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
         private static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
         private static readonly MetadataReference JsonNetReference = MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location);
+        private static readonly MetadataReference SystemReference = MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location);
 
         internal static readonly string DefaultFilePathPrefix = nameof(Test);
         internal static readonly string CSharpDefaultFileExt = "cs";
@@ -62,6 +63,7 @@ namespace CodeCracker.Test
             foreach (var project in projects)
             {
                 var compilation = await project.GetCompilationAsync().ConfigureAwait(true);
+                var t = compilation.GetDiagnostics(default);
                 var compilationWithAnalyzers = compilation.WithAnalyzers(ImmutableArray.Create(analyzer));
                 var diags = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync().ConfigureAwait(true);
                 CheckIfAnalyzerThrew(await compilationWithAnalyzers.GetAllDiagnosticsAsync().ConfigureAwait(true));
@@ -180,7 +182,8 @@ namespace CodeCracker.Test
                 parseOptions: parseOptions,
                 metadataReferences: ImmutableList.Create(
                     CorlibReference, SystemCoreReference, RegexReference,
-                    CSharpSymbolsReference, CodeAnalysisReference, JsonNetReference));
+                    CSharpSymbolsReference, CodeAnalysisReference, JsonNetReference,
+                    SystemReference));
 
             workspace.AddProject(projectInfo);
 

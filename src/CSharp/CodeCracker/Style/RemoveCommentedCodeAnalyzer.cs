@@ -65,7 +65,7 @@ namespace CodeCracker.CSharp.Style
                 .Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
 
             // class?
-            if (diagnostics.Length == 2)
+            if (diagnostics.Length == 2 && source.IndexOf("class") >= 0)
             {
                 // missing {
                 if (!diagnostics[0].Id.Equals("CS1514")) return false;
@@ -73,7 +73,17 @@ namespace CodeCracker.CSharp.Style
                 if (!diagnostics[1].Id.Equals("CS1513")) return false;
                 return true;
             }
+            else if (diagnostics.Length == 2)
+            {
+                if (diagnostics[0].Id.Equals("CS1733") && diagnostics[1].Id.Equals("CS1003"))
+                {
+                    return true;
+                }
 
+                // missing statement
+                if (!diagnostics[0].Id.Equals("CS1733")) return false;
+                return true;
+            }
             // if / while
             else if (diagnostics.Length == 1)
             {

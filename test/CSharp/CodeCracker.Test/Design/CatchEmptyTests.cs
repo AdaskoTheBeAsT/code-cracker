@@ -18,7 +18,7 @@ namespace CodeCracker.Test.CSharp.Design
     {
         class TypeName
         {
-            public async {|CS0246:Task|} {|CS0161:{|CS1983:Foo|}|}()
+            public async {|CS0246:Task|} {|CS0161:Foo|}()
             {
                 try
                 {
@@ -45,7 +45,7 @@ namespace CodeCracker.Test.CSharp.Design
     {
         class TypeName
         {
-            public async {|CS0246:Task|} {|CS0161:{|CS1983:Foo|}|}()
+            public async {|CS0246:Task|} {|CS0161:Foo|}()
             {
                 try
                 {

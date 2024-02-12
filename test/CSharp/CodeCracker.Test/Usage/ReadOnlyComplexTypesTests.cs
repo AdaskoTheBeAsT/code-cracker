@@ -295,25 +295,43 @@ class TypeName2
             {
                 public class MyClass
                 {
-                    private MyStruct myStruct = null;
+                    private MyStruct? myStruct = null;
                     private struct MyStruct
                     {
                         public int Value;
                     }
-                }        
-            }";
+                }
+
+                class Program
+                {
+                    static void Main(string[] args)
+                    {
+                        // noop
+                    }
+                }
+            }
+#pragma warning restore CS5001";
             const string source2 = @"
             namespace ConsoleApplication1
             {
                 public class MyClass
                 {
-                    private readonly MyStruct myStruct = null;
+                    private readonly MyStruct? myStruct = null;
                     private struct MyStruct
                     {
                         public int Value;
                     }
-                }        
-            }";
+                }
+
+                class Program
+                {
+                    static void Main(string[] args)
+                    {
+                        // noop
+                    }
+                }
+            }
+#pragma warning restore CS5001";
             await VerifyCSharpFixAsync(source1, source2, 0);
         }
         [Fact]
@@ -329,7 +347,13 @@ class TypeName2
             {
                 public int Value;
             }
-        }        
+        }
+        class Program
+        {
+            static void Main(string[] args)
+            {
+            }
+        }
     }";
             const string source2 = @"
     namespace ConsoleApplication1
@@ -341,7 +365,13 @@ class TypeName2
             {
                 public int Value;
             }
-        }        
+        }
+        class Program
+        {
+            static void Main(string[] args)
+            {
+            }
+        }
     }";
             await VerifyCSharpFixAsync(source1, source2, 0);
         }
@@ -356,7 +386,7 @@ class TypeName2
         {
             private MyStruct myStruct = new MyStruct();
         }
-        private struct MyStruct
+        public struct MyStruct
         {
             public int Value;
         }
@@ -368,7 +398,7 @@ class TypeName2
         {
             private readonly MyStruct myStruct = new MyStruct();
         }
-        private struct MyStruct
+        public struct MyStruct
         {
             public int Value;
         }

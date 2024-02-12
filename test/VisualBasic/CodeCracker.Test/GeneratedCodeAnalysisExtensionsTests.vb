@@ -487,12 +487,14 @@ End Class").IsGenerated().Should().BeTrue()
         Dim semanticModel = compilation.GetSemanticModel(tree)
         Dim analyzerOptions = New AnalyzerOptions(ImmutableArray(Of AdditionalText).Empty)
         Dim node = root.DescendantNodesAndSelf().OfType(Of T)().First()
+#Disable Warning BC40000 ' Type or member is obsolete
         Dim context = New SyntaxNodeAnalysisContext(node, semanticModel, analyzerOptions,
                                                     Sub(diag)
                                                     End Sub,
                                                     Function(diag)
                                                         Return True
                                                     End Function, Nothing)
+#Enable Warning BC40000 ' Type or member is obsolete
         Return context
     End Function
 End Class

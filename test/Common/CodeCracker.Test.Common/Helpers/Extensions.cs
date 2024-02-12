@@ -40,6 +40,35 @@ namespace ConsoleApplication1
 {code}
         }}
     }}
+
+    class Program
+    {{
+        static void Main(string[] args)
+        {{
+        }}
+    }}
+}}";
+        }
+
+        public static string WrapInCSharpMethod2(this string code, bool isAsync = false, string typeName = "TypeName", string usings = "")
+        {
+            if (!code.StartsWith("\r") || code.StartsWith("\n"))
+            {
+                code = "            " + code;
+            }
+
+            return $@"
+using System;{usings}
+
+namespace ConsoleApplication1
+{{
+    class {typeName}
+    {{
+        public {(isAsync ? "async " : "")}void Foo()
+        {{
+{code}
+        }}
+    }}
 }}";
         }
 

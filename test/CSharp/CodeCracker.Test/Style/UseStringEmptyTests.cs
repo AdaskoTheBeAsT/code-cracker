@@ -176,9 +176,9 @@ namespace CodeCracker.Test.CSharp.Style
         public async Task FixAllInSolutionChangeMethodToStringEmpty()
         {
             var test1 = @"var s = """" + """";".WrapInCSharpMethod();
-            var test2 = @"var s = """" + """";".WrapInCSharpMethod(typeName: "AnotherType");
+            var test2 = @"var s = """" + """";".WrapInCSharpMethod2(typeName: "AnotherType");
             var expected1 = @"var s = string.Empty + string.Empty;".WrapInCSharpMethod();
-            var expected2 = @"var s = string.Empty + string.Empty;".WrapInCSharpMethod(typeName: "AnotherType");
+            var expected2 = @"var s = string.Empty + string.Empty;".WrapInCSharpMethod2(typeName: "AnotherType");
             await VerifyCSharpFixAllAsync(new[] { test1, test2 }, new[] { expected1, expected2 });
         }
 

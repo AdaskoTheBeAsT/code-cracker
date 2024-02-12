@@ -68,6 +68,11 @@ namespace CodeCracker.CSharp.Refactoring
         {
             var result = false;
             var memberForObjectCreationExpr = objectCreationExpr.FirstAncestorOrSelfThatIsAMember();
+            if (memberForObjectCreationExpr == null)
+            {
+                return result;
+            }
+
             switch (memberForObjectCreationExpr.Kind())
             {
                 case SyntaxKind.ConstructorDeclaration:

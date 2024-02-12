@@ -363,7 +363,9 @@ namespace WebApplication3
             var semanticModel = compilation.GetSemanticModel(tree);
             var analyzerOptions = new AnalyzerOptions(ImmutableArray<AdditionalText>.Empty);
             var node = root.DescendantNodesAndSelf().OfType<T>().First();
+#pragma warning disable CS0618 // Type or member is obsolete
             var context = new SyntaxNodeAnalysisContext(node, semanticModel, analyzerOptions, diag => { }, diag => true, default(CancellationToken));
+#pragma warning restore CS0618 // Type or member is obsolete
             return context;
         }
 
@@ -377,7 +379,9 @@ namespace WebApplication3
             var node = root.DescendantNodesAndSelf().OfType<T>().First();
             var symbol = semanticModel.GetSymbolInfo(node).Symbol;
             if (symbol == null) symbol = semanticModel.GetDeclaredSymbol(node);
+#pragma warning disable CS0618 // Type or member is obsolete
             var context = new SymbolAnalysisContext(symbol, compilation, analyzerOptions, diag => { }, diag => true, default(CancellationToken));
+#pragma warning restore CS0618 // Type or member is obsolete
             return context;
         }
 
@@ -385,7 +389,9 @@ namespace WebApplication3
         {
             var tree = SyntaxFactory.ParseSyntaxTree(code, path: fileName);
             var analyzerOptions = new AnalyzerOptions(ImmutableArray<AdditionalText>.Empty);
+#pragma warning disable CS0618 // Type or member is obsolete
             var context = new SyntaxTreeAnalysisContext(tree, analyzerOptions, diag => { }, diag => true, default(CancellationToken));
+#pragma warning restore CS0618 // Type or member is obsolete
             return context;
         }
     }

@@ -100,6 +100,7 @@ namespace CodeCracker.Test.CSharp.Style
         public async Task RemovesNonPerfectIfCommentedCode()
         {
             var test = @"
+            var a = 1;
             // this comment will be preserved
             // if (a > 2)
             if (a > 3)
@@ -108,6 +109,7 @@ namespace CodeCracker.Test.CSharp.Style
             ".WrapInCSharpMethod();
 
             var fixtest = @"
+            var a = 1;
             // this comment will be preserved
             if (a > 3)
             {

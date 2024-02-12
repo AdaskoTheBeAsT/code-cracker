@@ -81,7 +81,7 @@ namespace CodeCracker.CSharp.Style
                 semanticModel = await newDocument.GetSemanticModelAsync(cancellationToken);
                 fieldSymbol = (IFieldSymbol)semanticModel.GetDeclaredSymbol(newRoot.GetCurrentNode(variableDeclarator));
                 //rename the field:
-                newSolution = await Renamer.RenameSymbolAsync(newDocument.Project.Solution, fieldSymbol, property.Identifier.ValueText, newDocument.Project.Solution.Workspace.Options, cancellationToken).ConfigureAwait(false);
+                newSolution = await Renamer.RenameSymbolAsync(newDocument.Project.Solution, fieldSymbol, default, property.Identifier.ValueText, cancellationToken).ConfigureAwait(false);
                 //cycle
                 newDocument = newSolution.GetDocument(newDocument.Id);
                 newRoot = await newDocument.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);

@@ -37,9 +37,8 @@ namespace CodeCracker.CSharp.Style
             if (solution == null) return null;
             var symbol = semanticModel.GetDeclaredSymbol(interfaceStatement, cancellationToken);
             if (symbol == null) return null;
-            var options = solution.Workspace.Options;
-            var newSolution = await Renamer.RenameSymbolAsync(solution, symbol, newName,
-                options, cancellationToken).ConfigureAwait(false);
+            var newSolution = await Renamer.RenameSymbolAsync(solution, symbol, default, newName,
+                cancellationToken).ConfigureAwait(false);
             return newSolution;
         }
     }

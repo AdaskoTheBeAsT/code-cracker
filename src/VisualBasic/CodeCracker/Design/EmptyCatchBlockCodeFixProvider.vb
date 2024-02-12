@@ -62,7 +62,7 @@ Namespace Design
         End Function
 
         Private Async Function InsertExceptionClassCommentAsync(document As Document, catchBlock As CatchBlockSyntax, cancellationToken As CancellationToken) As Task(Of Document)
-            Dim statements = New SyntaxList(Of SyntaxNode)().Add(SyntaxFactory.ThrowStatement())
+            Dim statements = New SyntaxList(Of StatementSyntax)().Add(SyntaxFactory.ThrowStatement())
 
             Dim catchStatement = SyntaxFactory.CatchStatement(
             SyntaxFactory.IdentifierName("ex"),

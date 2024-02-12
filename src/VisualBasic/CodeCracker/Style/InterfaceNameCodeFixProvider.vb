@@ -36,8 +36,7 @@ Namespace Style
 
             Dim solution = document.Project.Solution
             Dim symbol = semanticModel.GetDeclaredSymbol(interfaceStatement, cancellationToken)
-            Dim options = solution.Workspace.Options
-            Dim newSolution = Await Renamer.RenameSymbolAsync(solution, symbol, newName, options, cancellationToken).ConfigureAwait(False)
+            Dim newSolution = Await Renamer.RenameSymbolAsync(solution, symbol, New SymbolRenameOptions(), newName, cancellationToken).ConfigureAwait(False)
             Return newSolution
         End Function
     End Class

@@ -6,7 +6,7 @@
     <AssemblyName>CodeCracker.VisualBasic</AssemblyName>
     <PackageId>CodeCracker.VisualBasic.NewIdRequiredDueToNuGetBug</PackageId>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <WarningsNotAsErrors>AD0001,RS1010,RS1016,RS1017,RS1022</WarningsNotAsErrors>
+    <WarningsNotAsErrors>AD0001,RS1010,RS1016,RS1017,RS1022,RS1025,RS1026,RS1030,RS1031,RS1032,RS1033,RS1036</WarningsNotAsErrors>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -35,8 +35,8 @@
     <CopyNuGetImplementations>true</CopyNuGetImplementations>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.6.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="1.3.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="4.8.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\install.ps1">

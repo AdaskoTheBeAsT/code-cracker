@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -19,6 +20,8 @@ namespace CodeCracker.Test
             protected override CompilationOptions CreateCompilationOptions()
                 => new VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
 
+            protected override ParseOptions CreateParseOptions() => new VisualBasicParseOptions();
+
             protected override IEnumerable<DiagnosticAnalyzer> GetDiagnosticAnalyzers()
             {
                 yield return new TAnalyzer();
@@ -28,6 +31,8 @@ namespace CodeCracker.Test
             {
                 yield return new TCodeFix();
             }
+
+            public override Type SyntaxKindType => typeof(SyntaxKind);
         }
     }
 }

@@ -102,7 +102,7 @@ namespace CodeCracker.Test.CSharp.Design
             {
                 TestCode = test,
                 FixedCode = fixtest,
-                CodeFixIndex = 1,
+                CodeActionIndex = 1,
             }.RunAsync();
         }
 
@@ -134,7 +134,7 @@ namespace CodeCracker.Test.CSharp.Design
             {
                 TestCode = test,
                 FixedCode = fixtest,
-                CodeFixIndex = 2,
+                CodeActionIndex = 2,
             }.RunAsync();
         }
 

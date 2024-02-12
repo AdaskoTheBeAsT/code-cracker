@@ -40,8 +40,8 @@ namespace CodeCracker.CSharp.Reliability
                 SyntaxFactory.ArgumentList(
                     SyntaxFactory.SingletonSeparatedList(
                         SyntaxFactory.Argument(
-                            nameColon: SyntaxFactory.NameColon("continueOnCapturedContext"),
-                            refKindKeyword: SyntaxFactory.Token(SyntaxKind.None),
+                            // nameColon: SyntaxFactory.NameColon("continueOnCapturedContext"),
+                            //refKindKeyword: SyntaxFactory.Token(SyntaxKind.None),
                             expression: SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))))
                 .WithAdditionalAnnotations(Formatter.Annotation);
 

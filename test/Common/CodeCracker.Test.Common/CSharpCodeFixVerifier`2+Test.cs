@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
@@ -16,6 +17,8 @@ namespace CodeCracker.Test
 
             protected override string DefaultFileExt => "cs";
 
+            public override Type SyntaxKindType => typeof(SyntaxKind);
+
             protected override CompilationOptions CreateCompilationOptions()
                 => new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true);
 
@@ -28,6 +31,8 @@ namespace CodeCracker.Test
             {
                 yield return new TCodeFix();
             }
+
+            protected override ParseOptions CreateParseOptions() => new CSharpParseOptions();
         }
     }
 }

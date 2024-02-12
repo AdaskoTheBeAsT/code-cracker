@@ -13,6 +13,6 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyCulture("")>
 <Assembly: ComVisible(False)>
 <Assembly: NeutralResourcesLanguage("en")>
-<Assembly: AssemblyVersion("1.0.*")>
+<Assembly: AssemblyVersion("1.0.0.0")>
 <Assembly: AssemblyFileVersion("1.1.0.0")>
 <Assembly: InternalsVisibleTo("CodeCracker.Test.VisualBasic")>

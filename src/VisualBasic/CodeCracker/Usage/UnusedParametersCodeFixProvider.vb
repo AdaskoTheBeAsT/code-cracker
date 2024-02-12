@@ -65,8 +65,8 @@ Namespace Usage
                     locSemanticModel = Await referencingDocument.GetSemanticModelAsync(cancellationToken)
                     locRoot = Await locSemanticModel.SyntaxTree.GetRootAsync(cancellationToken)
                 End If
-                For Each loc In documentGroup
-                    Dim methodIdentifier = locRoot.FindNode(loc.Location.SourceSpan)
+                For Each loc1 In documentGroup
+                    Dim methodIdentifier = locRoot.FindNode(loc1.Location.SourceSpan)
                     Dim objectCreation = TryCast(methodIdentifier.Parent, ObjectCreationExpressionSyntax)
                     Dim arguments = If(objectCreation IsNot Nothing,
                         objectCreation.ArgumentList,

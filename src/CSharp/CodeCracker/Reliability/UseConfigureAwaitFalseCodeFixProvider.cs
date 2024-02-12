@@ -40,7 +40,9 @@ namespace CodeCracker.CSharp.Reliability
                 SyntaxFactory.ArgumentList(
                     SyntaxFactory.SingletonSeparatedList(
                         SyntaxFactory.Argument(
-                            SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))))
+                            nameColon: SyntaxFactory.NameColon("continueOnCapturedContext"),
+                            refKindKeyword: SyntaxFactory.Token(SyntaxKind.None),
+                            expression: SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))))
                 .WithAdditionalAnnotations(Formatter.Annotation);
 
             var newRoot = root.ReplaceNode(awaitExpression.Expression, newExpression);

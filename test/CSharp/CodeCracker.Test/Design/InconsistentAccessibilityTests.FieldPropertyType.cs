@@ -28,7 +28,7 @@ public class DependedUpon
 {
 }";
 
-            await Verify.VerifyCodeFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(testCode, fixedCode);
         }
 
 		[Fact]
@@ -52,7 +52,7 @@ public class DependedUpon
 	}
 }";
 
-            await Verify.VerifyCodeFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(testCode, fixedCode);
         }
 
         [Fact]
@@ -75,7 +75,7 @@ public class DependedUpon
 {
 }";
 
-            await Verify.VerifyCodeFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(testCode, fixedCode);
         }
 
         [Fact]
@@ -107,7 +107,7 @@ public class DependedUpon
 {
 }";
 
-            await Verify.VerifyCodeFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(testCode, fixedCode);
         }
 
         [Fact]
@@ -139,7 +139,7 @@ public class DependedUpon
 {
 }";
 
-            await Verify.VerifyCodeFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(testCode, fixedCode);
         }
     }
 }

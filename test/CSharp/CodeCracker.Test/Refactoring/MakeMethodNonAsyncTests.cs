@@ -29,7 +29,7 @@ public static Task<int> FooAsync()
 }";
             var fixedCode = string.Format(codeFileTemplate, fixedMethod);
 
-            await VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await VerifyCSharpFixAsync(testCode, fixedCode);
         }
 
         protected override CodeFixProvider GetCodeFixProvider() => new MakeMethodNonAsyncCodeFixProvider();

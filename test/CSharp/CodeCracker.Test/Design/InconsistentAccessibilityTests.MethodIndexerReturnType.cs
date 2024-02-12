@@ -34,7 +34,7 @@ namespace CodeCracker.Test.CSharp.Design
     {
     }";
 
-            await Verify.VerifyCodeFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(testCode, fixedCode);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace CodeCracker.Test.CSharp.Design
     }
 }";
 
-            await Verify.VerifyCodeFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(testCode, fixedCode);
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace CodeCracker.Test.CSharp.Design
     {
     }";
 
-            await Verify.VerifyCodeFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(testCode, fixedCode);
         }
 
         [Fact]
@@ -125,7 +125,7 @@ namespace CodeCracker.Test.CSharp.Design
     }
 }";
 
-            await Verify.VerifyCodeFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(testCode, fixedCode);
         }
     }
 }

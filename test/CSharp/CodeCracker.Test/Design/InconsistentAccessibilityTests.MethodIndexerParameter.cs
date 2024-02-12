@@ -37,7 +37,7 @@ public class DependendedUpon
 {
 }";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Theory]
@@ -81,7 +81,7 @@ public class Dependent
     }
 }";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Theory]
@@ -107,7 +107,7 @@ public class Dependent
 {
 }";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Fact]
@@ -137,7 +137,7 @@ public class Dependent
     }
 }";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Fact]
@@ -165,7 +165,7 @@ public class DependendedUpon
 {
 }";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Fact]
@@ -189,7 +189,7 @@ public class Dependent
 }
 public delegate void DependedUpon(int a);";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Fact]
@@ -213,7 +213,7 @@ public class Dependent
 }
 public enum DependedUpon {}";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Fact]
@@ -237,7 +237,7 @@ public class Dependent
 }
 public interface DependedUpon {}";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Fact]
@@ -261,7 +261,7 @@ public class Dependent
 }
 public class DependedUpon<T> {}";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Fact]
@@ -289,7 +289,7 @@ public partial class DependedUpon {}
 class SomeClass {}
 public partial class DependedUpon {}";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Fact]
@@ -321,7 +321,7 @@ public class DependedUpon
 {
 }";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Fact]
@@ -353,7 +353,7 @@ public class DependedUpon
     }
 }";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
 
         [Fact]
@@ -393,7 +393,7 @@ public class DependedUpon2
 {
 }";
 
-            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode).ConfigureAwait(false);
+            await Verify.VerifyCodeFixAsync(sourceCode, fixedCode);
         }
     }
 }

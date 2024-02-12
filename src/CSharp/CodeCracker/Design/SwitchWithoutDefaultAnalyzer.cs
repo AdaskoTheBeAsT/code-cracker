@@ -42,10 +42,10 @@ namespace CodeCracker.CSharp.Design
             if (context.Node.IsKind(SyntaxKind.SwitchStatement))
             {
                 var switchStatementToAnalyse = (SwitchStatementSyntax)context.Node;
-                if (switchStatementToAnalyse.DescendantNodes().Where(n => n.Kind() == SyntaxKind.DefaultSwitchLabel).ToList().Count == 0)
+                if (switchStatementToAnalyse.DescendantNodes().Where(n => n.IsKind(SyntaxKind.DefaultSwitchLabel)).ToList().Count == 0)
                 {
                     var hasInitializer = from nodes in switchStatementToAnalyse.DescendantNodes()
-                                         where nodes.Kind() == SyntaxKind.IdentifierName
+                                         where nodes.IsKind(SyntaxKind.IdentifierName)
                                          select nodes;
                     if (!hasInitializer.Any()) return;
                     var hasTrueExpression = from nodes in switchStatementToAnalyse.DescendantNodes()

@@ -38,7 +38,7 @@ namespace CodeCracker.CSharp.Refactoring
             var node = root.FindNode(diagnostic.Location.SourceSpan);
             var methodDeclaration = node.FirstAncestorOrSelfOfType<MethodDeclarationSyntax>();
             var rewriter = new ReturnTaskFromResultRewriter();
-            var asyncKeyword = methodDeclaration.Modifiers.First(t => t.Kind() == SyntaxKind.AsyncKeyword);
+            var asyncKeyword = methodDeclaration.Modifiers.First(t => t.IsKind(SyntaxKind.AsyncKeyword));
             var newMethodDeclaration =
                 methodDeclaration
                     .WithModifiers(methodDeclaration.Modifiers.Remove(asyncKeyword))

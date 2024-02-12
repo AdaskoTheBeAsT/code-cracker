@@ -32,8 +32,8 @@ namespace CodeCracker.CSharp.Style
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
             var diagnosticSpan = diagnostic.Location.SourceSpan;
             var lambda = root.FindToken(diagnosticSpan.Start).Parent
-                .AncestorsAndSelf().First(x => x.Kind() == SyntaxKind.SimpleLambdaExpression ||
-                                               x.Kind() == SyntaxKind.ParenthesizedLambdaExpression);
+                .AncestorsAndSelf().First(x => x.IsKind(SyntaxKind.SimpleLambdaExpression) ||
+                                               x.IsKind(SyntaxKind.ParenthesizedLambdaExpression));
             var methodInvoke = ConvertLambdaExpressionToMethodGroupAnalyzer.GetInvocationIfAny(lambda);
             var newRoot = root.ReplaceNode(lambda as ExpressionSyntax, methodInvoke.Expression as ExpressionSyntax);
             var newDocument = document.WithSyntaxRoot(newRoot);

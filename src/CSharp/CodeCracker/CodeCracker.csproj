@@ -5,7 +5,7 @@
     <RootNamespace>CodeCracker.CSharp</RootNamespace>
     <AssemblyName>CodeCracker.CSharp</AssemblyName>
     <PackageId>CodeCracker.CSharp.NewIdRequiredDueToNuGetBug</PackageId>
-    <WarningsNotAsErrors>AD0001,RS1010,RS1016,RS1017,RS1022,RS1025,RS1026,RS1030,RS1031,RS1032,RS1033,RS1036</WarningsNotAsErrors>
+    <WarningsNotAsErrors>AD0001,RS1010,RS1016,RS1017,RS1022,RS1024,RS1025,RS1026,RS1030,RS1031,RS1032,RS1033,RS1036</WarningsNotAsErrors>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

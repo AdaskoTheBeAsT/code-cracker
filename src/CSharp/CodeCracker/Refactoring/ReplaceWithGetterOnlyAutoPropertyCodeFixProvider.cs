@@ -140,7 +140,7 @@ namespace CodeCracker.CSharp.Refactoring
             var propertySymbol = semanticModel.GetDeclaredSymbol(propertyDeclaration, cancellationToken);
             var declaredProperty = propertySymbol.GetMethod.DeclaringSyntaxReferences.FirstOrDefault();
             var declaredPropertySyntax = await declaredProperty.GetSyntaxAsync(cancellationToken);
-            var fieldIdentifier = declaredPropertySyntax.DescendantNodesAndTokens().FirstOrDefault(n => n.IsNode && n.Kind() == SyntaxKind.IdentifierName);
+            var fieldIdentifier = declaredPropertySyntax.DescendantNodesAndTokens().FirstOrDefault(n => n.IsNode && n.IsKind(SyntaxKind.IdentifierName));
             var fieldInfo = semanticModel.GetSymbolInfo(fieldIdentifier.AsNode());
             var fieldDeclaration = fieldInfo.Symbol.DeclaringSyntaxReferences.FirstOrDefault();
             var fieldDeclarationSyntax = await fieldDeclaration.GetSyntaxAsync();

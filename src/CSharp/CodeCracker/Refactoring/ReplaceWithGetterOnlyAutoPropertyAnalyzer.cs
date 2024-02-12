@@ -53,12 +53,13 @@ namespace CodeCracker.CSharp.Refactoring
             var declaration = reference.GetSyntax(context.CancellationToken) as AccessorDeclarationSyntax;
             if (declaration?.Body == null) return null;
             var returnNode = declaration.Body.ChildNodes().FirstOrDefault();
-            if (returnNode?.Kind() != SyntaxKind.ReturnStatement) return null;
+            if (!(returnNode?.IsKind(SyntaxKind.ReturnStatement) ?? false))
+                return null;
             var fieldNode = returnNode.ChildNodes().FirstOrDefault();
             if (fieldNode == null) return null;
-            if (fieldNode.Kind() == SyntaxKind.SimpleMemberAccessExpression)
+            if (fieldNode.IsKind(SyntaxKind.SimpleMemberAccessExpression))
                 fieldNode = (fieldNode as MemberAccessExpressionSyntax).Name;
-            if (fieldNode.Kind() != SyntaxKind.IdentifierName) return null;
+            if (!fieldNode.IsKind(SyntaxKind.IdentifierName)) return null;
             var model = context.Compilation.GetSemanticModel(fieldNode.SyntaxTree);
             var symbolInfo = model.GetSymbolInfo(fieldNode).Symbol as IFieldSymbol;
             if (symbolInfo != null &&

@@ -47,7 +47,7 @@ namespace CodeCracker.CSharp.Style
             var semanticNode = GetNodeRootForAnalysis(lambda);
             var newSemanticNode = newRoot.DescendantNodesAndSelf()
                 .Where(x => x.SpanStart == semanticNode.SpanStart && x.Span.OverlapsWith(context.Node.Span))
-                .LastOrDefault(x => x.Kind() == semanticNode.Kind());
+                .LastOrDefault(x => x.IsKind(semanticNode.Kind()));
 
             if (newSemanticNode == null || ReplacementChangesSemantics(semanticNode, newSemanticNode, context.SemanticModel)) return;
 
@@ -115,20 +115,20 @@ namespace CodeCracker.CSharp.Style
             var parentNodeToSpeculate = expression
                 .Ancestors(ascendOutOfTrivia: false)
                 .FirstOrDefault(node =>
-                node.Kind() != SyntaxKind.Argument &&
-                node.Kind() != SyntaxKind.ArgumentList);
+                !node.IsKind(SyntaxKind.Argument) &&
+                !node.IsKind(SyntaxKind.ArgumentList));
             return parentNodeToSpeculate ?? expression;
         }
 
         public static bool CanSpeculateOnNode(SyntaxNode node)
         {
-            return (node is StatementSyntax && node.Kind() != SyntaxKind.Block) ||
+            return (node is StatementSyntax && !node.IsKind(SyntaxKind.Block)) ||
                 node is CrefSyntax ||
-                node.Kind() == SyntaxKind.Attribute ||
-                node.Kind() == SyntaxKind.ThisConstructorInitializer ||
-                node.Kind() == SyntaxKind.BaseConstructorInitializer ||
-                node.Kind() == SyntaxKind.EqualsValueClause ||
-                node.Kind() == SyntaxKind.ArrowExpressionClause;
+                node.IsKind(SyntaxKind.Attribute) ||
+                node.IsKind(SyntaxKind.ThisConstructorInitializer) ||
+                node.IsKind(SyntaxKind.BaseConstructorInitializer) ||
+                node.IsKind(SyntaxKind.EqualsValueClause) ||
+                node.IsKind(SyntaxKind.ArrowExpressionClause);
         }
 
         private static bool ReplacementChangesSemantics(SyntaxNode originalExpression, SyntaxNode replacedExpression, SemanticModel semanticModel)

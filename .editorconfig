@@ -1,0 +1,13 @@
+root=true
+
+[*.csproj]
+indent_style = space
+indent_size = 2
+
+[*.props]
+indent_style = space
+indent_size = 2
+
+[*.targets]
+indent_style = space
+indent_size = 2

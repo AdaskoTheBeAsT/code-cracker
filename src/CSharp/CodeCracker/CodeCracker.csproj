@@ -4,9 +4,11 @@
     <OutputType>Library</OutputType>
     <RootNamespace>CodeCracker.CSharp</RootNamespace>
     <AssemblyName>CodeCracker.CSharp</AssemblyName>
-    <PackageId>CodeCracker.CSharp.NewIdRequiredDueToNuGetBug</PackageId>
-    <WarningsNotAsErrors>AD0001,RS1010,RS1016,RS1017,RS1022,RS1024,RS1025,RS1026,RS1030,RS1031,RS1032,RS1033,RS1036</WarningsNotAsErrors>
+    <WarningsNotAsErrors>AD0001,RS1010,RS1016,RS1017,RS1022,RS1024,RS1025,RS1026,RS1030,RS1031,RS1032,RS1033,RS1036,RS1038</WarningsNotAsErrors>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <WarningLevel>4</WarningLevel>
@@ -20,15 +22,31 @@
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <CopyNuGetImplementations>true</CopyNuGetImplementations>
   </PropertyGroup>
+	<PropertyGroup>
+		<PackageId>AdaskoTheBeAsT.CodeCracker.CSharp</PackageId>
+		<Version>1.1.0.3</Version>
+		<Authors>giggio;elemarjr;carloscds</Authors>
+		<Owners>giggio;elemarjr;carloscds</Owners>
+		<PackageLicenseUrl>https://github.com/code-cracker/code-cracker/blob/master/LICENSE.txt</PackageLicenseUrl>
+		<PackageProjectUrl>http://code-cracker.github.io/</PackageProjectUrl>
+		<PackageIconUrl>https://avatars1.githubusercontent.com/u/9695920?v=3&amp;s=200</PackageIconUrl>
+		<RequireLicenseAcceptance>true</RequireLicenseAcceptance>
+		<Description>
+			A analyzer library for C# that uses Roslyn to produce refactorings, code analysis, and other niceties.
+			This is a community project, free and open source. Everyone is invited to contribute, fork, share and use the code.
+      No money shall be charged by this software, nor it will be. Ever.
+      This is updated version with latest Roslyn and .NET SDK.
+		</Description>
+		<PackageReleaseNotes>See https://github.com/code-cracker/code-cracker/blob/master/CHANGELOG.md</PackageReleaseNotes>
+		<PackageTags>roslyn, analyzers</PackageTags>
+		<PackageCopyright>Copyright CodeCracker 2014-2024</PackageCopyright>
+		<DevelopmentDependency>true</DevelopmentDependency>
+	</PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0-beta1.23525.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="CodeCracker.nuspec">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="tools\install.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -49,5 +67,13 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\$(AssemblyName).pdb" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\CodeCracker.Common.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\CodeCracker.Common.pdb" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 </Project>

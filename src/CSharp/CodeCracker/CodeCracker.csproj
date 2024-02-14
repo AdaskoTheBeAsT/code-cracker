@@ -24,12 +24,12 @@
   </PropertyGroup>
 	<PropertyGroup>
 		<PackageId>AdaskoTheBeAsT.CodeCracker.CSharp</PackageId>
-		<Version>1.1.0.3</Version>
+		<Version>1.1.0.4</Version>
 		<Authors>giggio;elemarjr;carloscds</Authors>
 		<Owners>giggio;elemarjr;carloscds</Owners>
 		<PackageLicenseUrl>https://github.com/code-cracker/code-cracker/blob/master/LICENSE.txt</PackageLicenseUrl>
 		<PackageProjectUrl>http://code-cracker.github.io/</PackageProjectUrl>
-		<PackageIconUrl>https://avatars1.githubusercontent.com/u/9695920?v=3&amp;s=200</PackageIconUrl>
+		<!--<PackageIconUrl>https://avatars1.githubusercontent.com/u/9695920?v=3&amp;s=200</PackageIconUrl>-->
 		<RequireLicenseAcceptance>true</RequireLicenseAcceptance>
 		<Description>
 			A analyzer library for C# that uses Roslyn to produce refactorings, code analysis, and other niceties.

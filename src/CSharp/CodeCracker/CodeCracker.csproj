@@ -24,7 +24,7 @@
   </PropertyGroup>
 	<PropertyGroup>
 		<PackageId>AdaskoTheBeAsT.CodeCracker.CSharp</PackageId>
-		<Version>1.1.0.4</Version>
+		<Version>1.1.0.5</Version>
 		<Authors>giggio;elemarjr;carloscds</Authors>
 		<Owners>giggio;elemarjr;carloscds</Owners>
 		<PackageLicenseUrl>https://github.com/code-cracker/code-cracker/blob/master/LICENSE.txt</PackageLicenseUrl>

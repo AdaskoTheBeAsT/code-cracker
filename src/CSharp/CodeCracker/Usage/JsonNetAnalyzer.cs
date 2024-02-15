@@ -42,6 +42,7 @@ namespace CodeCracker.CSharp.Usage
             var invocationExpression = (InvocationExpressionSyntax)context.Node;
 
             var memberExpression = invocationExpression.Expression as MemberAccessExpressionSyntax;
+            if (memberExpression == null) return;
             if (memberExpression?.Name?.Identifier.ValueText != methodName) return;
 
             var memberSymbol = context.SemanticModel.GetSymbolInfo(memberExpression).Symbol;
@@ -68,7 +69,7 @@ namespace CodeCracker.CSharp.Usage
             }
             catch (Exception ex)
             {
-                var diag = Diagnostic.Create(Rule, literalParameter.GetLocation(), ex.InnerException.Message);
+                var diag = Diagnostic.Create(Rule, literalParameter.GetLocation(), ex.InnerException?.Message ?? ex.Message);
                 context.ReportDiagnostic(diag);
             }
         }

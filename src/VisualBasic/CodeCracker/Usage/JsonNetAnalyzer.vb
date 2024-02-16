@@ -4,6 +4,7 @@ Imports Microsoft.CodeAnalysis
 Imports Microsoft.CodeAnalysis.Diagnostics
 Imports Microsoft.CodeAnalysis.VisualBasic
 Imports Microsoft.CodeAnalysis.VisualBasic.Syntax
+Imports Newtonsoft.Json.Linq
 
 Namespace Usage
     <DiagnosticAnalyzer(LanguageNames.VisualBasic)>
@@ -58,14 +59,11 @@ Namespace Usage
 
         Private Shared Sub CheckJsonValue(context As SyntaxNodeAnalysisContext, literalParameter As LiteralExpressionSyntax, json As String)
             Try
-                parseMethodInfo.Value.Invoke(Nothing, {json})
+                JObject.Parse(json)
             Catch ex As Exception
                 Dim diag = Diagnostic.Create(Rule, literalParameter.GetLocation(), ex.InnerException.Message)
                 context.ReportDiagnostic(diag)
             End Try
         End Sub
-
-        Private Shared ReadOnly jObjectType As New Lazy(Of Type)(Function() System.Type.GetType("Newtonsoft.Json.Linq.JObject, Newtonsoft.Json"))
-        Private Shared ReadOnly parseMethodInfo As New Lazy(Of MethodInfo)(Function() jObjectType.Value.GetRuntimeMethod("Parse", {GetType(String)}))
     End Class
 End Namespace

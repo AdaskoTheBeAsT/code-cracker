@@ -72,7 +72,7 @@ namespace ConsoleApplication1
             var test = string.Format(TestCode, @"JObject.Parse(""{""name"":""foo""}"");");
             await VerifyCSharpHasNoDiagnosticsAsync(test);
         }
-        //
+        
         [Fact]
         public async Task IfJArrayParseIdentifierFoundAndJsonTextIsIncorrectCreatesDiagnostic()
         {

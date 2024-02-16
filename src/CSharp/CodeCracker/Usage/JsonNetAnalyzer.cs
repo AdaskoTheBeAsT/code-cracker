@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Newtonsoft.Json.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
@@ -38,25 +39,46 @@ namespace CodeCracker.CSharp.Usage
 
         private static void Analyzer(SyntaxNodeAnalysisContext context, string methodName, string methodFullDefinition)
         {
-            if (context.IsGenerated()) return;
-            var invocationExpression = (InvocationExpressionSyntax)context.Node;
+            if (context.IsGenerated())
+            {
+                return;
+            }
+            
+            if (!(context.Node is InvocationExpressionSyntax invocationExpression))
+            {
+                return;
+            }
 
-            var memberExpression = invocationExpression.Expression as MemberAccessExpressionSyntax;
-            if (memberExpression == null) return;
-            if (memberExpression?.Name?.Identifier.ValueText != methodName) return;
+            if (!(invocationExpression.Expression is MemberAccessExpressionSyntax memberExpression))
+            {
+                return;
+            }
+
+            if (memberExpression?.Name?.Identifier.ValueText != methodName)
+            {
+                return;
+            }
 
             var memberSymbol = context.SemanticModel.GetSymbolInfo(memberExpression).Symbol;
-            if (memberSymbol?.OriginalDefinition?.ToString() != methodFullDefinition) return;
+            if (memberSymbol?.OriginalDefinition?.ToString() != methodFullDefinition)
+            {
+                return;
+            }
 
             var argumentList = invocationExpression.ArgumentList;
-            if ((argumentList?.Arguments.Count ?? 0) != 1) return;
+            if ((argumentList?.Arguments.Count ?? 0) != 1)
+            {
+                return;
+            }
 
-            var literalParameter = argumentList.Arguments[0].Expression as LiteralExpressionSyntax;
-            if (literalParameter == null) return;
-
+            if (!(argumentList.Arguments[0].Expression is LiteralExpressionSyntax literalParameter))
+            {
+                return;
+            }
+            
             var jsonOpt = context.SemanticModel.GetConstantValue(literalParameter);
             var json = jsonOpt.Value as string;
-
+            
             CheckJsonValue(context, literalParameter, json);
         }
 
@@ -65,16 +87,17 @@ namespace CodeCracker.CSharp.Usage
         {
             try
             {
-                parseMethodInfo.Value.Invoke(null, new[] { json });
+                JObject.Parse(json);
+                //parseMethodInfo.Value.Invoke(null, new[] { json });
             }
             catch (Exception ex)
             {
-                var diag = Diagnostic.Create(Rule, literalParameter.GetLocation(), ex.InnerException?.Message ?? ex.Message);
+                var diag = Diagnostic.Create(Rule, literalParameter.GetLocation(), (ex.InnerException?.Message ?? ex.Message));
                 context.ReportDiagnostic(diag);
             }
         }
 
-        private static readonly Lazy<Type> jObjectType = new Lazy<Type>(() => Type.GetType("Newtonsoft.Json.Linq.JObject, Newtonsoft.Json"));
-        private static readonly Lazy<MethodInfo> parseMethodInfo = new Lazy<MethodInfo>(() => jObjectType.Value.GetRuntimeMethod("Parse", new[] { typeof(string) }));
+        //private static readonly Lazy<Type> jObjectType = new Lazy<Type>(() => Type.GetType("Newtonsoft.Json.Linq.JObject, Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed"));
+        //private static readonly Lazy<MethodInfo> parseMethodInfo = new Lazy<MethodInfo>(() => jObjectType.Value.GetRuntimeMethod("Parse", new[] { typeof(string) }));
     }
 }

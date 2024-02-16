@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>CodeCracker.CSharp</RootNamespace>
     <AssemblyName>CodeCracker.CSharp</AssemblyName>
@@ -8,7 +8,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <!--<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>-->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <WarningLevel>4</WarningLevel>
@@ -22,29 +22,37 @@
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <CopyNuGetImplementations>true</CopyNuGetImplementations>
   </PropertyGroup>
-	<PropertyGroup>
-		<PackageId>AdaskoTheBeAsT.CodeCracker.CSharp</PackageId>
-		<Version>1.1.0.6</Version>
-		<Authors>giggio;elemarjr;carloscds</Authors>
-		<Owners>giggio;elemarjr;carloscds</Owners>
-		<PackageLicenseUrl>https://github.com/code-cracker/code-cracker/blob/master/LICENSE.txt</PackageLicenseUrl>
-		<PackageProjectUrl>http://code-cracker.github.io/</PackageProjectUrl>
-		<!--<PackageIconUrl>https://avatars1.githubusercontent.com/u/9695920?v=3&amp;s=200</PackageIconUrl>-->
-		<RequireLicenseAcceptance>true</RequireLicenseAcceptance>
-		<Description>
-			A analyzer library for C# that uses Roslyn to produce refactorings, code analysis, and other niceties.
-			This is a community project, free and open source. Everyone is invited to contribute, fork, share and use the code.
+  <PropertyGroup>
+    <VSSDKTargetPlatformRegRootSuffix>Exp</VSSDKTargetPlatformRegRootSuffix>
+    <StartAction>Program</StartAction>
+    <StartProgram>$(DevEnvDir)devenv.exe</StartProgram>
+    <StartArguments>/rootsuffix $(VSSDKTargetPlatformRegRootSuffix)</StartArguments>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>AdaskoTheBeAsT.CodeCracker.CSharp</PackageId>
+    <Version>1.1.0.21</Version>
+    <Authors>giggio;elemarjr;carloscds</Authors>
+    <Owners>giggio;elemarjr;carloscds</Owners>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>http://code-cracker.github.io/</PackageProjectUrl>
+    <!--<PackageIconUrl>https://avatars1.githubusercontent.com/u/9695920?v=3&amp;s=200</PackageIconUrl>-->
+    <RequireLicenseAcceptance>true</RequireLicenseAcceptance>
+    <Description>
+      A analyzer library for C# that uses Roslyn to produce refactorings, code analysis, and other niceties.
+      This is a community project, free and open source. Everyone is invited to contribute, fork, share and use the code.
       No money shall be charged by this software, nor it will be. Ever.
       This is updated version with latest Roslyn and .NET SDK.
-		</Description>
-		<PackageReleaseNotes>See https://github.com/code-cracker/code-cracker/blob/master/CHANGELOG.md</PackageReleaseNotes>
-		<PackageTags>roslyn, analyzers</PackageTags>
-		<PackageCopyright>Copyright CodeCracker 2014-2024</PackageCopyright>
-		<DevelopmentDependency>true</DevelopmentDependency>
-	</PropertyGroup>
+    </Description>
+    <PackageReleaseNotes>See https://github.com/code-cracker/code-cracker/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <PackageTags>roslyn, analyzers</PackageTags>
+    <PackageCopyright>Copyright CodeCracker 2014-2024</PackageCopyright>
+    <DevelopmentDependency>true</DevelopmentDependency>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0-beta1.23525.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0-beta1.23525.2" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" GeneratePathProperty="true" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\install.ps1">
@@ -63,10 +71,7 @@
     <Folder Include="Security\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\CodeCracker.Common\CodeCracker.Common.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
+    <ProjectReference Include="..\..\Common\CodeCracker.Common\CodeCracker.Common.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -75,5 +80,6 @@
     <None Include="$(OutputPath)\$(AssemblyName).pdb" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\CodeCracker.Common.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\CodeCracker.Common.pdb" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\Newtonsoft.Json.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 </Project>

@@ -378,7 +378,9 @@ namespace WebApplication3
             var analyzerOptions = new AnalyzerOptions(ImmutableArray<AdditionalText>.Empty);
             var node = root.DescendantNodesAndSelf().OfType<T>().First();
             var symbol = semanticModel.GetSymbolInfo(node).Symbol;
+#pragma warning disable RS1039 // This call to 'SemanticModel.GetDeclaredSymbol()' will always return 'null'
             if (symbol == null) symbol = semanticModel.GetDeclaredSymbol(node);
+#pragma warning restore RS1039 // This call to 'SemanticModel.GetDeclaredSymbol()' will always return 'null'
 #pragma warning disable CS0618 // Type or member is obsolete
             var context = new SymbolAnalysisContext(symbol, compilation, analyzerOptions, diag => { }, diag => true, default(CancellationToken));
 #pragma warning restore CS0618 // Type or member is obsolete

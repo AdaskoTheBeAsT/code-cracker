@@ -4,7 +4,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>CodeCracker.CSharp</RootNamespace>
     <AssemblyName>CodeCracker.CSharp</AssemblyName>
-    <WarningsNotAsErrors>AD0001,RS1010,RS1016,RS1017,RS1022,RS1024,RS1025,RS1026,RS1030,RS1031,RS1032,RS1033,RS1036,RS1038</WarningsNotAsErrors>
+    <WarningsNotAsErrors>AD0001,RS1010,RS1016,RS1017,RS1022,RS1024,RS1025,RS1026,RS1030,RS1031,RS1032,RS1033,RS1036,RS1038,NU5128</WarningsNotAsErrors>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -30,7 +30,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>AdaskoTheBeAsT.CodeCracker.CSharp</PackageId>
-    <Version>1.1.0.22</Version>
+    <Version>1.1.0.23</Version>
     <Authors>giggio;elemarjr;carloscds</Authors>
     <Owners>giggio;elemarjr;carloscds</Owners>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -47,6 +47,7 @@
     <PackageTags>roslyn, analyzers</PackageTags>
     <PackageCopyright>Copyright CodeCracker 2014-2024</PackageCopyright>
     <DevelopmentDependency>true</DevelopmentDependency>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0-beta1.24072.1" PrivateAssets="all" ExcludeAssets="runtime">
@@ -83,5 +84,6 @@
     <None Include="$(OutputPath)\CodeCracker.Common.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\CodeCracker.Common.pdb" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\Newtonsoft.Json.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="..\..\..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>

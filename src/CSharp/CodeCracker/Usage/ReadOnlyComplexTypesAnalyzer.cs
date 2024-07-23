@@ -15,7 +15,7 @@ namespace CodeCracker.CSharp.Usage
         internal const string Title = "Complex fields must be readonly";
         internal const string Message = "Make '{0}' readonly";
         internal const string Category = SupportedCategories.Usage;
-        const string Description = "Complex fields must be readonly";
+        const string Description = "Complex fields must be readonly.";
 
         internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId.ReadOnlyComplexTypes.ToDiagnosticId(),

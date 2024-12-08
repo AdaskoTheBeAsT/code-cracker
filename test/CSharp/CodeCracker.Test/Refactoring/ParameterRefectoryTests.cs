@@ -223,7 +223,7 @@ public class NewClassFoo
         }
 
         [Fact]
-        public async void ShouldGenerateNewClassFoo2()
+        public async Task ShouldGenerateNewClassFoo2()
         {
             const string oldTest = @"
 using System;

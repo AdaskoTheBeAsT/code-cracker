@@ -1,4 +1,5 @@
-﻿using CodeCracker.CSharp.Refactoring;
+﻿using System.Threading.Tasks;
+using CodeCracker.CSharp.Refactoring;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
@@ -15,7 +16,7 @@ namespace CodeCracker.Test.CSharp.Refactoring
         [Theory]
         [InlineData("class")]
         [InlineData("struct")]
-        public async void AllowMembersOrderingForEmptyTypeShouldNotTriggerDiagnostic(string typeDeclaration)
+        public async Task AllowMembersOrderingForEmptyTypeShouldNotTriggerDiagnostic(string typeDeclaration)
         {
             var test = @"
             " + typeDeclaration + @" Foo
@@ -28,7 +29,7 @@ namespace CodeCracker.Test.CSharp.Refactoring
         [Theory]
         [InlineData("class")]
         [InlineData("struct")]
-        public async void AllowMembersOrderingForOneMemberShouldNotTriggerDiagnostic(string typeDeclaration)
+        public async Task AllowMembersOrderingForOneMemberShouldNotTriggerDiagnostic(string typeDeclaration)
         {
             var test = @"
             " + typeDeclaration + @" Foo
@@ -42,7 +43,7 @@ namespace CodeCracker.Test.CSharp.Refactoring
         [Theory]
         [InlineData("class")]
         [InlineData("struct")]
-        public async void AllowMembersOrderingForMoreThanOneMemberShouldTriggerDiagnostic(string typeDeclaration)
+        public async Task AllowMembersOrderingForMoreThanOneMemberShouldTriggerDiagnostic(string typeDeclaration)
         {
             var test = @"
             " + typeDeclaration + @" Foo

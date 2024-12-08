@@ -9,7 +9,7 @@ namespace CodeCracker.Test.CSharp.Usage
     public class DisposablesShouldCallSuppressFinalizeTests : CodeFixVerifier<DisposablesShouldCallSuppressFinalizeAnalyzer, DisposablesShouldCallSuppressFinalizeCodeFixProvider>
     {
         [Fact]
-        public async void AlreadyCallsSuppressFinalizeWithArrowMethod()
+        public async Task AlreadyCallsSuppressFinalizeWithArrowMethod()
         {
             const string source = @"
                 public class MyType : System.IDisposable
@@ -20,7 +20,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void AlreadyCallsSuppressFinalize()
+        public async Task AlreadyCallsSuppressFinalize()
         {
             const string source = @"
                 public class MyType : System.IDisposable
@@ -34,7 +34,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void DoNotWarnIfStructImplmentsIDisposableWithNoSuppressFinalizeCall()
+        public async Task DoNotWarnIfStructImplmentsIDisposableWithNoSuppressFinalizeCall()
         {
             const string test = @"
                 public struct MyType : System.IDisposable
@@ -48,7 +48,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void WarningIfClassImplmentsIDisposableWithNoSuppressFinalizeCall()
+        public async Task WarningIfClassImplmentsIDisposableWithNoSuppressFinalizeCall()
         {
             const string test = @"
                 public class MyType : System.IDisposable
@@ -66,7 +66,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void DoNotWarnIfClassImplementsIDisposableWithSuppressFinalizeCallInFinally()
+        public async Task DoNotWarnIfClassImplementsIDisposableWithSuppressFinalizeCallInFinally()
         {
             const string test = @"
                  public class MyType : System.IDisposable
@@ -87,7 +87,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void DoNotWarnIfClassImplementsIDisposableWithSuppressFinalizeCallInIf()
+        public async Task DoNotWarnIfClassImplementsIDisposableWithSuppressFinalizeCallInIf()
         {
             const string test = @"
                  public class MyType : System.IDisposable
@@ -105,7 +105,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void DoNotWarnIfClassImplementsIDisposableWithSuppressFinalizeCallInElse()
+        public async Task DoNotWarnIfClassImplementsIDisposableWithSuppressFinalizeCallInElse()
         {
             const string test = @"
                  public class MyType : System.IDisposable
@@ -160,7 +160,7 @@ namespace CodeCracker.Test.CSharp.Usage
 
 
         [Fact]
-        public async void NoWarningIfClassImplmentsIDisposableButDoesNotContainsAPublicConstructor()
+        public async Task NoWarningIfClassImplmentsIDisposableButDoesNotContainsAPublicConstructor()
         {
             const string test = @"
                 public class MyType : System.IDisposable
@@ -181,7 +181,7 @@ namespace CodeCracker.Test.CSharp.Usage
 
 
         [Fact]
-        public async void NoWarningIfClassIsAPrivateNestedType()
+        public async Task NoWarningIfClassIsAPrivateNestedType()
         {
             const string test = @"
                 public class MyType
@@ -200,7 +200,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void NoWarningIfClassIsNestedOfAPrivateNestedType()
+        public async Task NoWarningIfClassIsNestedOfAPrivateNestedType()
         {
             const string test = @"
                 public class MyType
@@ -222,7 +222,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void NoWarningIfStructDoesNotImplementsIDisposable()
+        public async Task NoWarningIfStructDoesNotImplementsIDisposable()
         {
             const string test = @"
                 public struct MyType
@@ -233,7 +233,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void NoWarningIfClassIsSealedWithNoUserDefinedFinalizer()
+        public async Task NoWarningIfClassIsSealedWithNoUserDefinedFinalizer()
         {
             const string test = @"
                 public sealed class MyType : System.IDisposable
@@ -248,7 +248,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void WarningIfSealedClassHaveUserDefinedFinalizerImplmentsIDisposableWithNoSuppressFinalizeCall()
+        public async Task WarningIfSealedClassHaveUserDefinedFinalizerImplmentsIDisposableWithNoSuppressFinalizeCall()
         {
             const string test = @"
                 public sealed class MyType : System.IDisposable
@@ -268,7 +268,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void NoWarningIfClassDoesNotImplementsIDisposable()
+        public async Task NoWarningIfClassDoesNotImplementsIDisposable()
         {
             const string test = @"
                 public class MyType
@@ -280,7 +280,7 @@ namespace CodeCracker.Test.CSharp.Usage
 
 
         [Fact]
-        public async void WhenClassImplementsIDisposableCallSuppressFinalize()
+        public async Task WhenClassImplementsIDisposableCallSuppressFinalize()
         {
             const string source = @"
                     using System;
@@ -305,7 +305,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void WhenClassHasParametrizedDisposeMethod()
+        public async Task WhenClassHasParametrizedDisposeMethod()
         {
             const string source = @"
                     using System;
@@ -337,7 +337,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void WhenClassExplicitImplementsOfIDisposableCallSuppressFinalize()
+        public async Task WhenClassExplicitImplementsOfIDisposableCallSuppressFinalize()
         {
             const string source = @"
                     using System;
@@ -361,7 +361,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void WhenClassHasParametrizedDisposeMethodAndExplicitlyImplementsIDisposable()
+        public async Task WhenClassHasParametrizedDisposeMethodAndExplicitlyImplementsIDisposable()
         {
             const string source = @"
                     using System;
@@ -397,7 +397,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void AddsSystemGCWhenSystemIsNotImported()
+        public async Task AddsSystemGCWhenSystemIsNotImported()
         {
             const string source = @"
                     public class MyType : System.IDisposable
@@ -429,7 +429,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void CallingSystemGCSupressFinalizeShouldNotGenerateDiags()
+        public async Task CallingSystemGCSupressFinalizeShouldNotGenerateDiags()
         {
             const string source = @"
                     public class MyType : System.IDisposable
@@ -449,7 +449,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void CallingGCSupressFinalizeWithAliasShouldNotGenerateDiags()
+        public async Task CallingGCSupressFinalizeWithAliasShouldNotGenerateDiags()
         {
             const string source = @"using A = System;
                     public class MyType : System.IDisposable
@@ -469,7 +469,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void UseSystemGCWhenSystemNamespaceWasNotImportedInCurrentContext()
+        public async Task UseSystemGCWhenSystemNamespaceWasNotImportedInCurrentContext()
         {
             const string source = @"
                     namespace A
@@ -507,7 +507,7 @@ namespace CodeCracker.Test.CSharp.Usage
         }
 
         [Fact]
-        public async void CallSupressWhenUsingExpressionBodiedMethod()
+        public async Task CallSupressWhenUsingExpressionBodiedMethod()
         {
             const string source = @"
                    using System;

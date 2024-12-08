@@ -1,4 +1,5 @@
-﻿using CodeCracker.CSharp.Design;
+﻿using System.Threading.Tasks;
+using CodeCracker.CSharp.Design;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
@@ -8,7 +9,7 @@ namespace CodeCracker.Test.CSharp.Design
     public class UseInvokeMethodToFireEventTests : CodeFixVerifier<UseInvokeMethodToFireEventAnalyzer, UseInvokeMethodToFireEventCodeFixProvider>
     {
         [Fact]
-        public async void WarningIfEventIsFiredDirectly()
+        public async Task WarningIfEventIsFiredDirectly()
         {
             const string test = @"
                 public class MyClass
@@ -29,7 +30,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyFiredDirectlyAndNotInitialized()
+        public async Task WarningIfEventIsReadOnlyFiredDirectlyAndNotInitialized()
         {
             const string test = @"
                 public class MyClass
@@ -50,7 +51,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyAndAssignedInIfInConstructor()
+        public async Task WarningIfEventIsReadOnlyAndAssignedInIfInConstructor()
         {
             const string test = @"
                 public class MyClass
@@ -79,7 +80,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyAndAssignedInForeachInConstructor()
+        public async Task WarningIfEventIsReadOnlyAndAssignedInForeachInConstructor()
         {
             const string test = @"
                 public class MyClass
@@ -108,7 +109,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyAndAssignedInForInConstructor()
+        public async Task WarningIfEventIsReadOnlyAndAssignedInForInConstructor()
         {
             const string test = @"
                 public class MyClass
@@ -137,7 +138,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyAndAssignedInWhileInConstructor()
+        public async Task WarningIfEventIsReadOnlyAndAssignedInWhileInConstructor()
         {
             const string test = @"
                 public class MyClass
@@ -167,7 +168,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyAndAssignedAfterReturnInConstructor()
+        public async Task WarningIfEventIsReadOnlyAndAssignedAfterReturnInConstructor()
         {
             const string test = @"
                 public class MyClass
@@ -197,7 +198,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyAndAssignedToNullRegularAssignmentOnFieldDeclaration()
+        public async Task WarningIfEventIsReadOnlyAndAssignedToNullRegularAssignmentOnFieldDeclaration()
         {
             const string test = @"
                 public class MyClass
@@ -218,7 +219,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyAndAssignedToNullInConstructor()
+        public async Task WarningIfEventIsReadOnlyAndAssignedToNullInConstructor()
         {
             const string test = @"
                 public class MyClass
@@ -244,7 +245,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyAndAssignedToNullAfterRegularAssignmentInConstructor()
+        public async Task WarningIfEventIsReadOnlyAndAssignedToNullAfterRegularAssignmentInConstructor()
         {
             const string test = @"
                 public class MyClass
@@ -271,7 +272,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyAndAssignedInAllSwitchCasesButNoDefaultInConstructor()
+        public async Task WarningIfEventIsReadOnlyAndAssignedInAllSwitchCasesButNoDefaultInConstructor()
         {
             const string test = @"
                 public class MyClass
@@ -301,7 +302,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfEventIsReadOnlyAndAssignedInASwitchCaseButNotAllInConstructor()
+        public async Task WarningIfEventIsReadOnlyAndAssignedInASwitchCaseButNotAllInConstructor()
         {
             const string test = @"
                 public class MyClass
@@ -331,7 +332,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void NotWarningIfEventIsReadOnlyAndAssignedInConstructor()
+        public async Task NotWarningIfEventIsReadOnlyAndAssignedInConstructor()
         {
             const string test = @"
                 public class MyClass
@@ -354,7 +355,7 @@ namespace CodeCracker.Test.CSharp.Design
 
 
         [Fact]
-        public async void AcceptExpressionBodiedMethods()
+        public async Task AcceptExpressionBodiedMethods()
         {
             const string test = @"
                 public class MyClass
@@ -370,7 +371,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void FixExpressionBodiedMethods()
+        public async Task FixExpressionBodiedMethods()
         {
             const string source = @"
                 public class MyClass
@@ -391,7 +392,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfCustomEventIsFiredDirectly()
+        public async Task WarningIfCustomEventIsFiredDirectly()
         {
             const string test = @"
                 public class MyArgs : System.EventArgs
@@ -417,7 +418,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void WarningIfCustomEventWithCustomDelegateIsFiredDirectly()
+        public async Task WarningIfCustomEventWithCustomDelegateIsFiredDirectly()
         {
             const string test = @"
                 public class MyArgs : System.EventArgs
@@ -445,7 +446,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void NotWarningIfEventIsFiredWithInvokeMethod()
+        public async Task NotWarningIfEventIsFiredWithInvokeMethod()
         {
             const string test = @"
                 public class MyClass
@@ -460,7 +461,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void NotWarningIfEventIsReadOnlyWithInitializer()
+        public async Task NotWarningIfEventIsReadOnlyWithInitializer()
         {
             const string test = @"
                 public class MyClass
@@ -475,7 +476,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void RaiseDiagnosticEvenWhenVerifiedForNullAndNotReturnedOrThrown()
+        public async Task RaiseDiagnosticEvenWhenVerifiedForNullAndNotReturnedOrThrown()
         {
             const string test = @"
                 public class MyClass
@@ -496,7 +497,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void RaiseDiagnosticEvenWhenVerifiedForNullAndNotReturnedOrThrownWithBlocklessIf()
+        public async Task RaiseDiagnosticEvenWhenVerifiedForNullAndNotReturnedOrThrownWithBlocklessIf()
         {
             const string test = @"
                 public class MyClass
@@ -515,7 +516,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void RaiseDiagnosticIfNullCheckIsAfterInvocation()
+        public async Task RaiseDiagnosticIfNullCheckIsAfterInvocation()
         {
             const string test = @"
                 public class MyClass
@@ -533,7 +534,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void IgnoreIfAlreadyVerifiedForNullWithThrow()
+        public async Task IgnoreIfAlreadyVerifiedForNullWithThrow()
         {
             const string test = @"
                 public class MyClass
@@ -548,7 +549,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void IgnoreIfAlreadyVerifiedForNullInverted()
+        public async Task IgnoreIfAlreadyVerifiedForNullInverted()
         {
             const string test = @"
                 public class MyClass
@@ -563,7 +564,7 @@ namespace CodeCracker.Test.CSharp.Design
         }
 
         [Fact]
-        public async void IgnoreIfAlreadyVerifiedForNotNullOnGrandparentIf()
+        public async Task IgnoreIfAlreadyVerifiedForNotNullOnGrandparentIf()
         {
             var test = @"
 public static void Execute(System.Action action)
@@ -580,7 +581,7 @@ public static void Execute(System.Action action)
         }
 
         [Fact]
-        public async void IgnoreIfAlreadyVerifiedForNotNullWithNullOnRight()
+        public async Task IgnoreIfAlreadyVerifiedForNotNullWithNullOnRight()
         {
             var test = @"
 public static void Execute(System.Action action)
@@ -592,7 +593,7 @@ public static void Execute(System.Action action)
         }
 
         [Fact]
-        public async void IgnoreIfAlreadyVerifiedForNotNullWithNullOnLeft()
+        public async Task IgnoreIfAlreadyVerifiedForNotNullWithNullOnLeft()
         {
             var test = @"
 public static void Execute(System.Action action)
@@ -604,7 +605,7 @@ public static void Execute(System.Action action)
         }
 
         [Fact]
-        public async void IgnoreIfAlreadyVerifiedForNullCreatesDiagnostic()
+        public async Task IgnoreIfAlreadyVerifiedForNullCreatesDiagnostic()
         {
             var test = @"
 public static void Execute(System.Action action)
@@ -619,7 +620,7 @@ public static void Execute(System.Action action)
         }
 
         [Fact]
-        public async void IgnoreIfAlreadyVerifiedForNullWithReturn()
+        public async Task IgnoreIfAlreadyVerifiedForNullWithReturn()
         {
             const string test = @"
                 public class MyClass
@@ -634,7 +635,7 @@ public static void Execute(System.Action action)
         }
 
         [Fact]
-        public async void NotWarningIfIsNotAnEvent()
+        public async Task NotWarningIfIsNotAnEvent()
         {
             const string test = @"
                 public class MyClass
@@ -654,7 +655,7 @@ public static void Execute(System.Action action)
         }
 
         [Fact]
-        public async void WhenEventIsFiredDirectlyShouldUseInvokeMethod()
+        public async Task WhenEventIsFiredDirectlyShouldUseInvokeMethod()
         {
             const string source = @"
                 public class MyClass
@@ -682,7 +683,7 @@ public static void Execute(System.Action action)
         }
 
         [Fact]
-        public async void KeepCommentsWhenReplacedWithCodeFix()
+        public async Task KeepCommentsWhenReplacedWithCodeFix()
         {
             const string source = @"
                 public class MyClass
@@ -709,7 +710,7 @@ public static void Execute(System.Action action)
         }
 
         [Fact]
-        public async void IgnoreMemberAccess()
+        public async Task IgnoreMemberAccess()
         {
             var test = @"var tuple = new Tuple<int, Action>(1, null);
 tuple.Item2();".WrapInCSharpMethod();
@@ -717,7 +718,7 @@ tuple.Item2();".WrapInCSharpMethod();
         }
 
         [Fact]
-        public async void ReportOnParametersWhenReturnTypeIsAReferenceType()
+        public async Task ReportOnParametersWhenReturnTypeIsAReferenceType()
         {
             var test = @"
 public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where T : System.Attribute where TReturn : class
@@ -731,7 +732,7 @@ public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where T
         }
 
         [Fact]
-        public async void WhenMethodInvokedWithNonReferenceTypeHasOnlyIfNullDiagnostic()
+        public async Task WhenMethodInvokedWithNonReferenceTypeHasOnlyIfNullDiagnostic()
         {
             var test = @"
                 public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where TReturn : struct
@@ -748,7 +749,7 @@ public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where T
         }
 
         [Fact]
-        public async void FixWithInvokeWithNonReferenceType()
+        public async Task FixWithInvokeWithNonReferenceType()
         {
             var source = @"
                 public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where T : System.Attribute where TReturn : struct
@@ -764,7 +765,7 @@ public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where T
         }
 
         [Fact]
-        public async void FixWithCheckForNullWithNonReferenceType()
+        public async Task FixWithCheckForNullWithNonReferenceType()
         {
             var source = @"
                 public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where T : System.Attribute where TReturn : struct
@@ -782,7 +783,7 @@ public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where T
         }
 
         [Fact]
-        public async void FixWithCheckForNullAndKeepCommentsWhenReplacedWithCodeFix()
+        public async Task FixWithCheckForNullAndKeepCommentsWhenReplacedWithCodeFix()
         {
             const string source = @"
                 public class MyClass
@@ -813,7 +814,7 @@ public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where T
         }
 
         [Fact]
-        public async void FixWhenInvocationIsInsideABlockWithoutBraces()
+        public async Task FixWhenInvocationIsInsideABlockWithoutBraces()
         {
             const string source = @"
                 public class MyClass
@@ -848,7 +849,7 @@ public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where T
         }
 
         [Fact]
-        public async void OnlyOneFixIfExpressionBodied()
+        public async Task OnlyOneFixIfExpressionBodied()
         {
             const string test = @"
                 public class MyClass
@@ -864,7 +865,7 @@ public static TReturn Method<T, TReturn>(System.Func<T, TReturn> getter) where T
         }
 
         [Fact]
-        public async void FixWhenInsideExpressionWithInvoke()
+        public async Task FixWhenInsideExpressionWithInvoke()
         {
             var code = @"
 public System.Func<string, bool> AllowInteraction { get; protected set; }
@@ -890,7 +891,7 @@ protected bool AllowedInteraction()
         }
 
         [Fact]
-        public async void FixWhenInsideABinaryExpressionWithPrecedenceWithInvoke()
+        public async Task FixWhenInsideABinaryExpressionWithPrecedenceWithInvoke()
         {
             var code = @"
 void Foo(Func<bool> f)
@@ -912,7 +913,7 @@ void Foo(Func<bool> f)
         }
 
         [Fact]
-        public async void FixWhenInsideExpressionWithCheckForNull()
+        public async Task FixWhenInsideExpressionWithCheckForNull()
         {
             var code = @"
 public System.Func<string, bool> AllowInteraction { get; protected set; }
@@ -940,7 +941,7 @@ protected bool AllowedInteraction()
         }
 
         [Fact]
-        public async void FixWhenInsideExpressionAndNameAlreadyExists()
+        public async Task FixWhenInsideExpressionAndNameAlreadyExists()
         {
             var code = @"
 public System.Func<string, bool> AllowInteraction { get; protected set; }
@@ -970,7 +971,7 @@ protected bool AllowedInteraction()
         }
 
         [Fact]
-        public async void WhenEventIsFiredDirectlyShouldCopyItToVariable()
+        public async Task WhenEventIsFiredDirectlyShouldCopyItToVariable()
         {
             const string source = @"
                 public class MyClass
@@ -1000,7 +1001,7 @@ protected bool AllowedInteraction()
         }
 
         [Fact]
-        public async void NotWarningIfEventIsCopiedToLocalVariableBeforeFire()
+        public async Task NotWarningIfEventIsCopiedToLocalVariableBeforeFire()
         {
             const string test = @"
                 public class MyClass
@@ -1019,7 +1020,7 @@ protected bool AllowedInteraction()
         }
 
         [Fact]
-        public async void IgnoreIfAlreadyCheckedForNull()
+        public async Task IgnoreIfAlreadyCheckedForNull()
         {
             const string test = @"
 public static int Get(Func<int,int> method) {
@@ -1030,7 +1031,7 @@ public static int Get(Func<int,int> method) {
         }
 
         [Fact]
-        public async void IgnoreIfInLogicalOrThatCheckedForNull()
+        public async Task IgnoreIfInLogicalOrThatCheckedForNull()
         {
             const string test = @"
 public class Foo
@@ -1045,7 +1046,7 @@ public class Foo
         }
 
         [Fact]
-        public async void IgnoreIfInLogicalAndThatCheckedForNotNull()
+        public async Task IgnoreIfInLogicalAndThatCheckedForNotNull()
         {
             const string test = @"
 public class Foo
@@ -1060,7 +1061,7 @@ public class Foo
         }
 
         [Fact]
-        public async void IgnoreIfInConstructorAndThatCheckedForNotNull()
+        public async Task IgnoreIfInConstructorAndThatCheckedForNotNull()
         {
             //https://github.com/code-cracker/code-cracker/issues/926
             const string test = @"

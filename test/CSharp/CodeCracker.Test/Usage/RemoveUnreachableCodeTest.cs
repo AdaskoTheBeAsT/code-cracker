@@ -1,4 +1,5 @@
-﻿using CodeCracker.CSharp.Usage;
+﻿using System.Threading.Tasks;
+using CodeCracker.CSharp.Usage;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Xunit;
 
@@ -9,7 +10,7 @@ namespace CodeCracker.Test.CSharp.Usage
         protected override CodeFixProvider GetCodeFixProvider() => new RemoveUnreachableCodeCodeFixProvider();
 
         [Fact]
-        public async void FixUnreacheableVariableDeclaration()
+        public async Task FixUnreacheableVariableDeclaration()
         {
             const string source = @"
 class Foo
@@ -32,7 +33,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableInvocation()
+        public async Task FixUnreacheableInvocation()
         {
             const string source = @"
 class Foo
@@ -57,7 +58,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableInvocationWithMemberAccess()
+        public async Task FixUnreacheableInvocationWithMemberAccess()
         {
             const string source = @"
 class Foo
@@ -80,7 +81,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableFor()
+        public async Task FixUnreacheableFor()
         {
             const string source = @"
 class Foo
@@ -103,7 +104,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableInvocationInsideFor()
+        public async Task FixUnreacheableInvocationInsideFor()
         {
             const string source = @"
 class Foo
@@ -133,7 +134,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableIncrement()
+        public async Task FixUnreacheableIncrement()
         {
             const string source = @"
 class Foo
@@ -161,7 +162,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableInIf()
+        public async Task FixUnreacheableInIf()
         {
             const string source = @"
 class Foo
@@ -188,7 +189,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableInNestedIfWithInvocation()
+        public async Task FixUnreacheableInNestedIfWithInvocation()
         {
             const string source = @"
 class Foo
@@ -218,7 +219,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableInElse()
+        public async Task FixUnreacheableInElse()
         {
             const string source = @"
 class Foo
@@ -244,7 +245,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableInWhile()
+        public async Task FixUnreacheableInWhile()
         {
             const string source = @"
 class Foo
@@ -271,7 +272,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableInLambda()
+        public async Task FixUnreacheableInLambda()
         {
             const string source = @"
 class Foo
@@ -293,7 +294,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixUnreacheableLambda()
+        public async Task FixUnreacheableLambda()
         {
             const string source = @"
 class Foo
@@ -316,7 +317,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixAllUnreacheableCode()
+        public async Task FixAllUnreacheableCode()
         {
             const string source = @"
 class Foo
@@ -340,7 +341,7 @@ class Foo
         }
 
         [Fact]
-        public async void FixAllProjectUnreacheableCode()
+        public async Task FixAllProjectUnreacheableCode()
         {
             const string source1 = @"
 class Foo

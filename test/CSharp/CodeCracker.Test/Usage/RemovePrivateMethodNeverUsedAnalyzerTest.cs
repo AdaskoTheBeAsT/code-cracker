@@ -1,4 +1,5 @@
-﻿using CodeCracker.CSharp.Usage;
+﻿using System.Threading.Tasks;
+using CodeCracker.CSharp.Usage;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
@@ -13,7 +14,7 @@ namespace CodeCracker.Test.CSharp.Usage
         [InlineData("ContractInvariantMethod")]
         [InlineData("System.Diagnostics.Contracts.ContractInvariantMethod")]
         [InlineData("DataMember")]
-        public async void DoesNotGenerateDiagnosticsWhenMethodAttributeIsAnException(string value)
+        public async Task DoesNotGenerateDiagnosticsWhenMethodAttributeIsAnException(string value)
         {
             var source = @"
 class Foo
@@ -27,7 +28,7 @@ class Foo
         [Theory]
         [InlineData("[Obsolete, Fact]")]
         [InlineData("[Obsolete]\n[Fact]")]
-        public async void DoesNotGenerateDiagnosticsWhenMethodAttributeIsAnExceptionAndMixedWithOtherAttributes(string value)
+        public async Task DoesNotGenerateDiagnosticsWhenMethodAttributeIsAnExceptionAndMixedWithOtherAttributes(string value)
         {
             var source = @"
 class Foo
@@ -39,7 +40,7 @@ class Foo
         }
 
         [Fact]
-        public async void GenerateDiagnosticsOnNotIgnoredAttributes()
+        public async Task GenerateDiagnosticsOnNotIgnoredAttributes()
         {
             const string source = @"
 class Foo
@@ -57,7 +58,7 @@ class Foo
 
 
         [Fact]
-        public async void DoesNotGenerateDiagnostics()
+        public async Task DoesNotGenerateDiagnostics()
         {
             const string test = @"
   public class Foo
@@ -78,7 +79,7 @@ class Foo
         }
 
         [Fact]
-        public async void DoesNotGenerateDiagnosticsWhenPrivateMethodIsInvokedInPartialClasses()
+        public async Task DoesNotGenerateDiagnosticsWhenPrivateMethodIsInvokedInPartialClasses()
         {
             const string test = @"
 public partial class Foo
@@ -102,7 +103,7 @@ public partial class Foo
 
 
         [Fact]
-        public async void DoesNotGenerateDiagnosticsWhenPrivateMethodIsInvokedInPartialClasses2()
+        public async Task DoesNotGenerateDiagnosticsWhenPrivateMethodIsInvokedInPartialClasses2()
         {
             const string test = @"
 public partial class foo
@@ -129,7 +130,7 @@ public partial class foo
 
 
         [Fact]
-        public async void FixRemovesPrivateMethodWhenItIsNotInvokedInPartialClasses()
+        public async Task FixRemovesPrivateMethodWhenItIsNotInvokedInPartialClasses()
         {
             const string test = @"
 public partial class Foo
@@ -164,7 +165,7 @@ public partial class Foo
         }
 
         [Fact]
-        public async void WhenPrivateMethodUsedDoesNotGenerateDiagnostics()
+        public async Task WhenPrivateMethodUsedDoesNotGenerateDiagnostics()
         {
             const string test = @"
   public class Foo
@@ -180,7 +181,7 @@ public partial class Foo
         }
 
         [Fact]
-        public async void WhenPrivateMethodUsedInAttributionDoesNotGenerateDiagnostics()
+        public async Task WhenPrivateMethodUsedInAttributionDoesNotGenerateDiagnostics()
         {
             const string test = @"
 using System;
@@ -198,7 +199,7 @@ public class Foo
         }
 
         [Fact]
-        public async void WhenPrivateMethodDoesNotUsedShouldCreateDiagnostic()
+        public async Task WhenPrivateMethodDoesNotUsedShouldCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -214,7 +215,7 @@ class Foo
         }
 
         [Fact]
-        public async void GenericMethodDoesNotCreateDiagnostic()
+        public async Task GenericMethodDoesNotCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -230,7 +231,7 @@ class Foo
         }
 
         [Fact]
-        public async void GenericMethodWithConstraintDoesNotCreateDiagnostic()
+        public async Task GenericMethodWithConstraintDoesNotCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -246,7 +247,7 @@ class Foo
         }
 
         [Fact]
-        public async void StaticMethodDoesNotCreateDiagnostic()
+        public async Task StaticMethodDoesNotCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -262,7 +263,7 @@ class Foo
         }
 
         [Fact]
-        public async void PrivateGenericStaticWithConstraintDoesNotCreateDiagnostic()
+        public async Task PrivateGenericStaticWithConstraintDoesNotCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -280,7 +281,7 @@ class Foo
         }
 
         [Fact]
-        public async void MainMethodEntryPointReturningVoidDoesNotCreateDiagnostic()
+        public async Task MainMethodEntryPointReturningVoidDoesNotCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -294,7 +295,7 @@ class Foo
         }
 
         [Fact]
-        public async void MainMethodEntryPointReturningIntegerDoesNotCreateDiagnostic()
+        public async Task MainMethodEntryPointReturningIntegerDoesNotCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -308,7 +309,7 @@ class Foo
         }
 
         [Fact]
-        public async void MainMethodEntryPointWithoutParameterDoesNotCreateDiagnostic()
+        public async Task MainMethodEntryPointWithoutParameterDoesNotCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -322,7 +323,7 @@ class Foo
         }
 
         [Fact]
-        public async void MainMethodEntryPointWithoutStaticModifierShouldCreateDiagnostic()
+        public async Task MainMethodEntryPointWithoutStaticModifierShouldCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -341,7 +342,7 @@ class Foo
         }
 
         [Fact]
-        public async void MainMethodEntryPointWithMoreThanOneParameterShouldCreateDiagnostic()
+        public async Task MainMethodEntryPointWithMoreThanOneParameterShouldCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -360,7 +361,7 @@ class Foo
         }
 
         [Fact]
-        public async void MainMethodEntryPointWithDifferentParameterShouldCreateDiagnostic()
+        public async Task MainMethodEntryPointWithDifferentParameterShouldCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -379,7 +380,7 @@ class Foo
         }
 
         [Fact]
-        public async void MainMethodEntryPointWithDifferentReturnTypeShouldCreateDiagnostic()
+        public async Task MainMethodEntryPointWithDifferentReturnTypeShouldCreateDiagnostic()
         {
             const string source = @"
 class Foo
@@ -398,7 +399,7 @@ class Foo
         }
 
         [Fact]
-        public async void ExplicitlyImplementedInterfaceMethodDoesNotCreateDiagnostic()
+        public async Task ExplicitlyImplementedInterfaceMethodDoesNotCreateDiagnostic()
         {
             const string source = @"
 public class Foo : System.IEquatable<Foo>
@@ -413,7 +414,7 @@ public class Foo : System.IEquatable<Foo>
 
         // see https://msdn.microsoft.com/en-us/library/53b8022e(v=vs.110).aspx
         [Fact]
-        public async void WinFormsPropertyDefaultValueDefinitionMethodsShouldBeIgnored()
+        public async Task WinFormsPropertyDefaultValueDefinitionMethodsShouldBeIgnored()
         {
             var source = @"
 public int PropertyXXX {
@@ -436,7 +437,7 @@ private void ResetPropertyXXX() { };
         }
 
         [Fact]
-        public async void WinFormsPropertyDefaultValueDefinitionMethodsMustHaveCorrectSignature()
+        public async Task WinFormsPropertyDefaultValueDefinitionMethodsMustHaveCorrectSignature()
         {
             var source = @"
 public int Property1 { get; set; }
@@ -459,7 +460,7 @@ private void ResetProperty2(int i) { };
         }
 
         [Fact]
-        public async void WinFormsPropertyDefaultValueDefinitionMethodsMustHaveCorrespondingProperty()
+        public async Task WinFormsPropertyDefaultValueDefinitionMethodsMustHaveCorrespondingProperty()
         {
             var source = @"
 private bool ShouldSerializePropertyXXX() => true;
@@ -472,7 +473,7 @@ private void ResetPropertyXXX() { };
         }
 
         [Fact]
-        public async void WinFormsPropertyDefaultValueDefinitionMethodsMustHaveASuffix()
+        public async Task WinFormsPropertyDefaultValueDefinitionMethodsMustHaveASuffix()
         {
             var source = @"
 private bool ShouldSerialize() => true;

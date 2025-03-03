@@ -30,7 +30,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>AdaskoTheBeAsT.CodeCracker.CSharp</PackageId>
-    <Version>1.1.0.33</Version>
+    <Version>1.1.0.43</Version>
     <Authors>giggio;elemarjr;carloscds</Authors>
     <Owners>giggio;elemarjr;carloscds</Owners>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -53,10 +53,10 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.12.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.13.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" GeneratePathProperty="true" />
-    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="9.0.2" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\install.ps1">

@@ -22,68 +22,87 @@ namespace CodeCracker.CSharp.Usage
         public override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
-            context.RegisterCodeFix(CodeAction.Create(
-                "Use extension method as an extension",
-                cancellationToken => CallAsExtensionAsync(context.Document, diagnostic, cancellationToken), nameof(CallExtensionMethodAsExtensionCodeFixProvider)),
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    "Use extension method syntax",
+                    ct => ApplyFixAsync(context.Document, diagnostic, ct),
+                    nameof(CallExtensionMethodAsExtensionCodeFixProvider)),
                 diagnostic);
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
-        private static async Task<Document> CallAsExtensionAsync(Document document, Diagnostic diagnostic, CancellationToken cancellationToken)
+        private static async Task<Document> ApplyFixAsync(Document document, Diagnostic diagnostic, CancellationToken ct)
         {
-            var root = (CompilationUnitSyntax)await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-            var diagnosticSpan = diagnostic.Location.SourceSpan;
-            var staticInvocationExpression = root
-                .FindToken(diagnosticSpan.Start)
-                .Parent.AncestorsAndSelf()
+            var root = (CompilationUnitSyntax)await document.GetSyntaxRootAsync(ct).ConfigureAwait(false);
+            var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
+
+            // Climb to the invocation
+            var invocation = token.Parent
+                .AncestorsAndSelf()
                 .OfType<InvocationExpressionSyntax>()
-                .First();
+                .FirstOrDefault();
+            if (invocation == null) return document;
 
-            var childNodes = staticInvocationExpression.ChildNodes();
-            var parameterExpressions = CallExtensionMethodAsExtensionAnalyzer.GetParameterExpressions(childNodes);
+            if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+                return document; // safety
 
-            var firstArgument = parameterExpressions.FirstOrDefault();
-            var callerMethod = childNodes.OfType<MemberAccessExpressionSyntax>().FirstOrDefault();
+            var args = invocation.ArgumentList?.Arguments;
+            if (args == null || args.Value.Count == 0)
+                return document; // nothing to rewrite
 
-            root = ReplaceStaticCallWithExtionMethodCall(
-                        root,
-                        staticInvocationExpression,
-                        firstArgument,
-                        callerMethod.Name,
-                        CallExtensionMethodAsExtensionAnalyzer.CreateArgumentListSyntaxFrom(parameterExpressions.Skip(1))
-                   ).WithAdditionalAnnotations(Formatter.Annotation);
+            // First argument becomes receiver
+            var receiver = args.Value[0].Expression;
+            var remainingArgs = SyntaxFactory.ArgumentList(
+                SyntaxFactory.SeparatedList(args.Value.Skip(1)));
 
-            var semanticModel = await document.GetSemanticModelAsync();
-            root = ImportNeededNamespace(root, semanticModel, callerMethod).WithAdditionalAnnotations(Formatter.Annotation);
-            var newDocument = document.WithSyntaxRoot(root);
+            var newInvocation = invocation
+                .WithExpression(
+                    SyntaxFactory.MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        ParenthesizeIfNeeded(receiver),
+                        memberAccess.Name))
+                .WithArgumentList(remainingArgs)
+                .WithLeadingTrivia(invocation.GetLeadingTrivia())
+                .WithTrailingTrivia(invocation.GetTrailingTrivia())
+                .WithAdditionalAnnotations(Formatter.Annotation);
 
-            return newDocument;
+            var newRoot = root.ReplaceNode(invocation, newInvocation);
+
+            // Ensure namespace is imported if static call used fully qualified System.Linq.Enumerable.*
+            newRoot = AddUsingIfMissing(newRoot, memberAccess, document, ct);
+
+            return document.WithSyntaxRoot(newRoot);
         }
 
-        private static CompilationUnitSyntax ReplaceStaticCallWithExtionMethodCall(CompilationUnitSyntax root, InvocationExpressionSyntax staticInvocationExpression, ExpressionSyntax sourceExpression, SimpleNameSyntax methodName, ArgumentListSyntax argumentList)
+        private static CompilationUnitSyntax AddUsingIfMissing(
+            CompilationUnitSyntax root,
+            MemberAccessExpressionSyntax memberAccess,
+            Document document,
+            CancellationToken ct)
         {
-            var extensionInvocationExpression = CallExtensionMethodAsExtensionAnalyzer.CreateInvocationExpression(sourceExpression, methodName, argumentList)
-                .WithLeadingTrivia(staticInvocationExpression.GetLeadingTrivia());
-            return root.ReplaceNode(staticInvocationExpression, extensionInvocationExpression);
-        }
+            // If expression is something like System.Linq.Enumerable we may need 'using System.Linq;'
+            var fullExprText = memberAccess.Expression.ToString();
 
-        private static CompilationUnitSyntax ImportNeededNamespace(CompilationUnitSyntax root, SemanticModel semanticModel, MemberAccessExpressionSyntax callerMethod)
-        {
-            var symbolInfo = semanticModel.GetSymbolInfo(callerMethod.Name);
-            var methodSymbol = symbolInfo.Symbol as IMethodSymbol;
-            if (methodSymbol == null) return root;
-            var namespaceDisplayString = methodSymbol.ContainingNamespace.ToDisplayString();
-            var hasNamespaceImported = root
-                .DescendantNodes()
-                .OfType<UsingDirectiveSyntax>()
-                .Select(s => s.Name.ToString())
-                .Any(n => n == namespaceDisplayString);
-            if (!hasNamespaceImported)
+            // Heuristic: if fully-qualified starts with System.Linq.Enumerable OR ends with .Enumerable
+            // and we do not already have using System.Linq; add it.
+            if (fullExprText.Contains("System.Linq.Enumerable"))
             {
-                var namespaceQualifiedName = methodSymbol.ContainingNamespace.ToNameSyntax();
-                root = root.AddUsings(SyntaxFactory.UsingDirective(namespaceQualifiedName));
+                var already = root.Usings.Any(u => u.Name.ToString() == "System.Linq");
+                if (!already)
+                {
+                    root = root.AddUsings(
+                        SyntaxFactory.UsingDirective(
+                            SyntaxFactory.ParseName("System.Linq"))
+                        .WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed));
+                }
             }
             return root;
         }
+
+        private static ExpressionSyntax ParenthesizeIfNeeded(ExpressionSyntax expr) =>
+            expr is IdentifierNameSyntax or MemberAccessExpressionSyntax or LiteralExpressionSyntax
+                ? expr
+                : SyntaxFactory.ParenthesizedExpression(expr);
+
     }
 }

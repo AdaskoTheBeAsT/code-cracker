@@ -1,4 +1,4 @@
-﻿Imports FluentAssertions
+﻿Imports AwesomeAssertions
 Imports Microsoft.CodeAnalysis
 Imports Microsoft.CodeAnalysis.Diagnostics
 Imports System.Collections.Immutable

@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CodeCracker.Test
 {
+#pragma warning disable RS1038,RS1041
     [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic)]
     public class EmptyAnalyzer : DiagnosticAnalyzer
     {
@@ -14,4 +15,5 @@ namespace CodeCracker.Test
         {
         }
     }
+#pragma warning restore RS1038,RS1041
 }

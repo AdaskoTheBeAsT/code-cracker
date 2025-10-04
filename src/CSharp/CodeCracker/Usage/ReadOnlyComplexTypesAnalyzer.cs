@@ -3,9 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Collections.Generic;
-using System;
 
 namespace CodeCracker.CSharp.Usage
 {
@@ -23,7 +21,7 @@ namespace CodeCracker.CSharp.Usage
             Message,
             Category,
             DiagnosticSeverity.Warning,
-            isEnabledByDefault: false,
+            isEnabledByDefault: true,
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ReadOnlyComplexTypes));
 
@@ -35,15 +33,20 @@ namespace CodeCracker.CSharp.Usage
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
             if (context.IsGenerated()) return;
-            var fieldDeclaration = context.Node as FieldDeclarationSyntax;
-            var variable = fieldDeclaration?.Declaration.Variables.LastOrDefault();
-            if (variable?.Initializer == null) return;
+            var fieldDeclaration = (FieldDeclarationSyntax)context.Node;
             var semanticModel = context.SemanticModel;
-            var fieldSymbol = semanticModel.GetDeclaredSymbol(variable) as IFieldSymbol;
-            if (!IsComplexValueType(semanticModel, fieldDeclaration)) return;
-            if (!CanBeMadeReadonly(fieldSymbol)) return;
-            ReportDiagnostic(context, variable, variable.Initializer.Value);
+
+            foreach (var variable in fieldDeclaration.Declaration.Variables)
+            {
+                if (variable.Initializer == null) continue;
+                var fieldSymbol = semanticModel.GetDeclaredSymbol(variable) as IFieldSymbol;
+                if (fieldSymbol == null) continue;
+                if (!IsComplexValueType(semanticModel, fieldDeclaration)) continue;
+                if (!CanBeMadeReadonly(fieldSymbol)) continue;
+                ReportDiagnostic(context, variable, variable.Initializer.Value);
+            }
         }
+
         private static bool IsComplexValueType(SemanticModel semanticModel, FieldDeclarationSyntax fieldDeclaration)
         {
             var fieldTypeName = fieldDeclaration.Declaration.Type;

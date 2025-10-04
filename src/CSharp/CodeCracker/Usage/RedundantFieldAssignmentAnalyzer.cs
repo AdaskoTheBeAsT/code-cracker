@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
@@ -72,72 +71,122 @@ namespace CodeCracker.CSharp.Usage
 
         private static bool IsValueTypeAssigningToDefault(ITypeSymbol fieldType, ExpressionSyntax initializerValue, SemanticModel semanticModel)
         {
-            switch (fieldType.SpecialType)
+            static bool IsFullyQualified(ITypeSymbol t, string fq) =>
+                t != null &&
+                t.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                 .TrimStart("global::".ToCharArray()) == fq;
+
+            // Booleans
+            if (fieldType.SpecialType == SpecialType.System_Boolean)
             {
-                case SpecialType.System_Boolean:
-                    {
-                        var literal = initializerValue as LiteralExpressionSyntax;
-                        if (literal == null) return false;
-                        var boolValue = (bool)literal.Token.Value;
-                        if (boolValue) return false;
-                        break;
-                    }
-                case SpecialType.System_SByte:
-                case SpecialType.System_Byte:
-                case SpecialType.System_Int16:
-                case SpecialType.System_UInt16:
-                case SpecialType.System_Int32:
-                case SpecialType.System_UInt32:
-                case SpecialType.System_Int64:
-                case SpecialType.System_UInt64:
-                case SpecialType.System_Decimal:
-                case SpecialType.System_Single:
-                case SpecialType.System_Double:
-                    if (initializerValue.ToString() != "0")
-                    {
-                        var literal = initializerValue as LiteralExpressionSyntax;
-                        if (literal == null) return false;
-                        var possibleZero = Convert.ToDouble(literal.Token.Value);
-                        if (possibleZero != 0) return false;
-                    }
-                    break;
-                case SpecialType.System_IntPtr:
-                    {
-                        var memberAccess = initializerValue as MemberAccessExpressionSyntax;
-                        if (memberAccess == null) return false;
-                        var memberAccessFieldSymbol = semanticModel.GetSymbolInfo(memberAccess).Symbol as IFieldSymbol;
-                        if (memberAccessFieldSymbol?.ToString() != "System.IntPtr.Zero") return false;
-                        break;
-                    }
-                case SpecialType.System_UIntPtr:
-                    {
-                        var memberAccess = initializerValue as MemberAccessExpressionSyntax;
-                        if (memberAccess == null) return false;
-                        var memberAccessFieldSymbol = semanticModel.GetSymbolInfo(memberAccess).Symbol as IFieldSymbol;
-                        if (memberAccessFieldSymbol?.ToString() != "System.UIntPtr.Zero") return false;
-                        break;
-                    }
-                case SpecialType.System_DateTime:
-                    {
-                        var memberAccess = initializerValue as MemberAccessExpressionSyntax;
-                        if (memberAccess == null) return false;
-                        var memberAccessFieldSymbol = semanticModel.GetSymbolInfo(memberAccess).Symbol as IFieldSymbol;
-                        if (memberAccessFieldSymbol?.ToString() != "System.DateTime.MinValue") return false;
-                        break;
-                    }
-                //case SpecialType.System_Enum: //does not work, enums come back as none. Bug on roslyn? See solution below.
-                default:
-                    if (fieldType.TypeKind != TypeKind.Enum) return false;
-                    if (initializerValue.ToString() != "0")
-                    {
-                        var literal = initializerValue as LiteralExpressionSyntax;
-                        if (literal == null) return false;
-                        var possibleZero = Convert.ToDouble(literal.Token.Value);
-                        if (possibleZero != 0) return false;
-                    }
-                    break;
+                if (initializerValue is LiteralExpressionSyntax litBool &&
+                    litBool.Token.Value is bool b &&
+                    b == false) return true;
+                return false;
             }
-            return true;
+
+            // Numeric primitives
+            if (fieldType.SpecialType is
+                SpecialType.System_SByte or
+                SpecialType.System_Byte or
+                SpecialType.System_Int16 or
+                SpecialType.System_UInt16 or
+                SpecialType.System_Int32 or
+                SpecialType.System_UInt32 or
+                SpecialType.System_Int64 or
+                SpecialType.System_UInt64 or
+                SpecialType.System_Decimal or
+                SpecialType.System_Single or
+                SpecialType.System_Double)
+            {
+                if (initializerValue.ToString() == "0") return true;
+                if (initializerValue is LiteralExpressionSyntax litNum)
+                {
+                    try
+                    {
+                        var val = Convert.ToDouble(litNum.Token.Value);
+                        return Math.Abs(val) == 0d;
+                    }
+                    catch { return false; }
+                }
+                return false;
+            }
+
+            // IntPtr / UIntPtr
+            if (fieldType.SpecialType == SpecialType.System_IntPtr || IsFullyQualified(fieldType, "System.IntPtr"))
+                return IsIntPtrLikeZero(initializerValue, semanticModel, expectUInt: false);
+
+            if (fieldType.SpecialType == SpecialType.System_UIntPtr || IsFullyQualified(fieldType, "System.UIntPtr"))
+                return IsIntPtrLikeZero(initializerValue, semanticModel, expectUInt: true);
+
+            // DateTime
+            if (fieldType.SpecialType == SpecialType.System_DateTime || IsFullyQualified(fieldType, "System.DateTime"))
+            {
+                if (initializerValue is not MemberAccessExpressionSyntax ma) return false;
+                if (semanticModel.GetSymbolInfo(ma).Symbol is IFieldSymbol fs)
+                    return fs.Name == "MinValue" &&
+                        fs.ContainingType != null &&
+                        (fs.ContainingType.SpecialType == SpecialType.System_DateTime ||
+                         IsFullyQualified(fs.ContainingType, "System.DateTime"));
+
+                var text = ma.ToString();
+                return text == "DateTime.MinValue" || text == "System.DateTime.MinValue";
+            }
+
+            // Enums
+            if (fieldType.TypeKind == TypeKind.Enum)
+            {
+                if (initializerValue.ToString() == "0") return true;
+                if (initializerValue is LiteralExpressionSyntax litEnum)
+                {
+                    try
+                    {
+                        var val = Convert.ToDouble(litEnum.Token.Value);
+                        return Math.Abs(val) == 0d;
+                    }
+                    catch { return false; }
+                }
+                return false;
+            }
+
+            return false;
+
+            static bool IsIntPtrLikeZero(ExpressionSyntax expr, SemanticModel sm, bool expectUInt)
+            {
+                if (expr is not MemberAccessExpressionSyntax ma) return false;
+
+                // Prefer symbol if available
+                if (sm.GetSymbolInfo(ma).Symbol is IFieldSymbol fs)
+                {
+                    // Instead of relying on ToString() (which can yield "nint.Zero"/"nuint.Zero"),
+                    // match by field name plus containing type special type or metadata name.
+                    if (fs.Name == "Zero" && fs.ContainingType != null)
+                    {
+                        var ct = fs.ContainingType;
+                        var isIntPtr =
+                            ct.SpecialType == SpecialType.System_IntPtr ||
+                            ct.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                              .TrimStart("global::".ToCharArray()) == "System.IntPtr" ||
+                            ct.Name == "IntPtr" || ct.Name == "nint";
+
+                        var isUIntPtr =
+                            ct.SpecialType == SpecialType.System_UIntPtr ||
+                            ct.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                              .TrimStart("global::".ToCharArray()) == "System.UIntPtr" ||
+                            ct.Name == "UIntPtr" || ct.Name == "nuint";
+
+                        if (expectUInt) return isUIntPtr;
+                        return isIntPtr;
+                    }
+                    return false;
+                }
+
+                // Fallback textual
+                var txt = ma.ToString();
+                return expectUInt
+                    ? txt is "UIntPtr.Zero" or "System.UIntPtr.Zero" or "nuint.Zero"
+                    : txt is "IntPtr.Zero" or "System.IntPtr.Zero" or "nint.Zero";
+            }
         }
     }
 }

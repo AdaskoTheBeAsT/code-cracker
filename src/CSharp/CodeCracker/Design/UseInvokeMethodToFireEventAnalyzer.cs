@@ -55,6 +55,7 @@ namespace CodeCracker.CSharp.Design
             if (IsPartOfATernaryThatChecksForNull(invocation, context.SemanticModel, symbol)) return;
             if (IsPartOfALogicalOrThatChecksForNull(invocation, context.SemanticModel, symbol)) return;
             if (IsPartOfALogicalAndThatChecksForNotNull(invocation, context.SemanticModel, symbol)) return;
+            if (HasArgumentNullExceptionThrowIfNullBeforeInvocation(invocation, context.SemanticModel, symbol)) return;
             if (symbol.IsReadOnlyAndInitializedForCertain(context)) return;
 
             context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.GetLocation(), identifier.Identifier.Text));
@@ -126,6 +127,100 @@ namespace CodeCracker.CSharp.Design
             else return false;
             if (symbol.Equals(identifierSymbol)) return true;
             return false;
+        }
+
+        private static bool HasArgumentNullExceptionThrowIfNullBeforeInvocation(
+            InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel,
+            ISymbol symbol)
+        {
+            // Looks for a preceding call that guards the same symbol with:
+            //  System.ArgumentNullException.ThrowIfNull(symbol);
+            //  ArgumentNullException.ThrowIfNull(symbol);                (with using System;)
+            //  ThrowIfNull(symbol);                                     (with using static System.ArgumentNullException;)
+            //
+            // This implementation is intentionally simple and resilient to:
+            //  - Missing ThrowIfNull symbol (older target frameworks)
+            //  - Extra nesting / formatting
+            //  - Minimal test snippets (no wrapping class/namespace)
+
+            var block = invocation.FirstAncestorOfType<BlockSyntax>();
+            if (block == null) return false;
+
+            var invocationStart = invocation.SpanStart;
+
+            // Detect a static using for ArgumentNullException (textual or semantic)
+            var root = block.SyntaxTree.GetRoot();
+            bool hasUsingStaticArgNull =
+                root.DescendantNodes()
+                    .OfType<UsingDirectiveSyntax>()
+                    .Any(u =>
+                        u.StaticKeyword.Kind() == SyntaxKind.StaticKeyword &&
+                        (u.Name.ToString() == "System.ArgumentNullException"
+                         || u.Name.ToString() == "ArgumentNullException"
+                         || (semanticModel.GetSymbolInfo(u.Name).Symbol is INamedTypeSymbol ts
+                             && ts.Name == nameof(ArgumentNullException)
+                             && ts.ContainingNamespace?.ToDisplayString() == "System")));
+
+            // Fallback textual scan (covers cases where symbol resolution fails entirely)
+            if (!hasUsingStaticArgNull)
+            {
+                var fullText = root.GetText().ToString();
+                if (fullText.IndexOf("using static System.ArgumentNullException", StringComparison.Ordinal) >= 0)
+                    hasUsingStaticArgNull = true;
+            }
+
+            foreach (var priorInvocation in block.DescendantNodes()
+                         .OfType<InvocationExpressionSyntax>()
+                         .Where(i => i.SpanStart < invocationStart))
+            {
+                if (!IsThrowIfNullGuard(priorInvocation)) continue;
+
+                var args = priorInvocation.ArgumentList?.Arguments;
+                if (args == null || args.Value.Count == 0) continue;
+
+                var guarded = semanticModel.GetSymbolInfo(args.Value[0].Expression).Symbol;
+                if (guarded != null && SymbolEqualityComparer.Default.Equals(guarded, symbol))
+                    return true;
+            }
+
+            return false;
+
+            bool IsThrowIfNullGuard(InvocationExpressionSyntax candidate)
+            {
+                // Get invoked simple name
+                var simpleName = candidate.Expression switch
+                {
+                    IdentifierNameSyntax id => id.Identifier.Text,
+                    MemberAccessExpressionSyntax ma => ma.Name.Identifier.Text,
+                    _ => null
+                };
+                if (simpleName != "ThrowIfNull") return false;
+
+                // Qualification rules
+                switch (candidate.Expression)
+                {
+                    case IdentifierNameSyntax:
+                        // Must have using static
+                        return hasUsingStaticArgNull;
+
+                    case MemberAccessExpressionSyntax ma:
+                        // Collapse left side text (handles fully-qualified chain)
+                        var left = ma.Expression.ToString();
+                        if (left == "System.ArgumentNullException" || left == "ArgumentNullException")
+                            return true;
+
+                        // Semantic fallback (in case of partial qualification or alias)
+                        if (semanticModel.GetSymbolInfo(ma.Expression).Symbol is INamedTypeSymbol leftType &&
+                            leftType.Name == nameof(ArgumentNullException) &&
+                            leftType.ContainingNamespace?.ToDisplayString() == "System")
+                            return true;
+                        return false;
+
+                    default:
+                        return false;
+                }
+            }
         }
     }
 }

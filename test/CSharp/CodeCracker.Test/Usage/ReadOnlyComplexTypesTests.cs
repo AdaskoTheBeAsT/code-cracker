@@ -1,9 +1,4 @@
 ﻿using CodeCracker.CSharp.Usage;
-using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -435,6 +430,7 @@ class TypeName2
     }";
             await VerifyCSharpFixAsync(source1, source2, 0);
         }
+
         [Fact]
         public async Task enumerationsDoesNotCreateDiagnostic()
         {

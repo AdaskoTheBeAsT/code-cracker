@@ -139,7 +139,7 @@ public static class C
         }
 
         [Fact]
-        public async Task WhenCallExtensionMethodAsStaticMenthodShouldFix()
+        public async Task WhenCallExtensionMethodAsStaticMethodShouldFix()
         {
             const string source = @"
                     using System.Linq;
@@ -322,7 +322,11 @@ public static class ExtensionsTestCase
         Enumerable.Select(new[] { """" }, s => s == """");
     }
 }";
-            await VerifyCSharpHasNoDiagnosticsAsync(source);
+            var expected = new DiagnosticResult(DiagnosticId.CallExtensionMethodAsExtension.ToDiagnosticId(), DiagnosticSeverity.Info)
+                .WithLocation(11, 9)
+                .WithMessage("Do not call 'Select' method of class 'Enumerable' as a static method");
+
+            await VerifyCSharpDiagnosticAsync(source, expected);
         }
 
         [Fact]

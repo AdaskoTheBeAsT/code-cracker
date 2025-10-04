@@ -22,30 +22,51 @@ namespace CodeCracker.CSharp.Usage
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
-            var parameters = diagnostic.Properties.Where(p => p.Key.StartsWith("param"));
-            foreach (var param in parameters)
+
+            // Ensure deterministic ordering of fixes: a, b, value (the test expects index 2 => "value")
+            var orderedParamNames = diagnostic.Properties
+                .Where(p => p.Key.StartsWith("param"))
+                .OrderBy(p => p.Key)               // keys are "param{parameterName}" => param a, param b, param value
+                .Select(p => p.Value)
+                .ToList();
+
+            foreach (var paramName in orderedParamNames)
             {
-                var message = "Use '" + param.Value + "'";
-                context.RegisterCodeFix(CodeAction.Create(message, c => FixParamAsync(context.Document, diagnostic, param.Value, c), nameof(ArgumentExceptionCodeFixProvider)), diagnostic);
+                var title = $"Use '{paramName}'";
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        title,
+                        c => FixParamAsync(context.Document, diagnostic, paramName, c),
+                        equivalenceKey: $"Use_{paramName}"),
+                    diagnostic);
             }
-            return Task.FromResult(0);
+
+            return Task.CompletedTask;
         }
 
-        private async static Task<Document> FixParamAsync(Document document, Diagnostic diagnostic, string newParamName, CancellationToken cancellationToken)
+        private static async Task<Document> FixParamAsync(Document document, Diagnostic diagnostic, string newParamName, CancellationToken cancellationToken)
         {
-            var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-            var objectCreation = root.FindToken(diagnostic.Location.SourceSpan.Start).Parent.AncestorsAndSelf().OfType<ObjectCreationExpressionSyntax>().First();
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var type = objectCreation.Type;
-            var typeSymbol = semanticModel.GetSymbolInfo(type).Symbol as ITypeSymbol;
-            var argumentList = objectCreation.ArgumentList as ArgumentListSyntax;
-            var paramNameLiteral = argumentList.Arguments[1].Expression as LiteralExpressionSyntax;
-            var paramNameOpt = semanticModel.GetConstantValue(paramNameLiteral);
-            var currentParamName = paramNameOpt.Value as string;
-            var newLiteral = SyntaxFactory.ParseExpression($"\"{newParamName}\"");
+            var root = (await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false))!;
+            var objectCreation = root
+                .FindToken(diagnostic.Location.SourceSpan.Start)
+                .Parent
+                .AncestorsAndSelf()
+                .OfType<ObjectCreationExpressionSyntax>()
+                .First();
+
+            var argumentList = objectCreation.ArgumentList;
+            if (argumentList == null || argumentList.Arguments.Count < 2)
+                return document;
+
+            // Assumes second ctor argument is the param name literal (already guaranteed by analyzer)
+            if (argumentList.Arguments[1].Expression is not LiteralExpressionSyntax paramNameLiteral)
+                return document;
+
+            var newLiteral = SyntaxFactory.ParseExpression($"\"{newParamName}\"")
+                .WithTriviaFrom(paramNameLiteral);
+
             var newRoot = root.ReplaceNode(paramNameLiteral, newLiteral);
-            var newDocument = document.WithSyntaxRoot(newRoot);
-            return newDocument;
+            return document.WithSyntaxRoot(newRoot);
         }
     }
 }

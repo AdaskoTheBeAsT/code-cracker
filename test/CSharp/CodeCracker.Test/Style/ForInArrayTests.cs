@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using System.Threading.Tasks;
 using Xunit;
-using System;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace CodeCracker.Test.CSharp.Style

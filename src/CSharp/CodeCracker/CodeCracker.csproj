@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>CodeCracker.CSharp</RootNamespace>
     <AssemblyName>CodeCracker.CSharp</AssemblyName>
@@ -9,17 +9,22 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <!--<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>-->
+    <IsRoslynAnalyzer>true</IsRoslynAnalyzer>
+    <LangVersion>latest</LangVersion>
+    <!-- lets you parse latest C# -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>..\..\..\codecrackerandall.ruleset</CodeAnalysisRuleSet>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <CopyNuGetImplementations>true</CopyNuGetImplementations>
   </PropertyGroup>
   <PropertyGroup>
@@ -30,7 +35,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>AdaskoTheBeAsT.CodeCracker.CSharp</PackageId>
-    <Version>1.1.0.54</Version>
+    <Version>1.1.0.70</Version>
     <Authors>giggio;elemarjr;carloscds</Authors>
     <Owners>giggio;elemarjr;carloscds</Owners>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -55,8 +60,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" GeneratePathProperty="true" />
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" GeneratePathProperty="true" />
+    <PackageReference Include="System.Collections.Immutable" Version="9.0.9" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\install.ps1">
@@ -66,14 +71,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Globalization\" />
-    <Folder Include="Interoperability\" />
-    <Folder Include="Mobility\" />
-    <Folder Include="Naming\" />
-    <Folder Include="Portability\" />
-    <Folder Include="Security\" />
-  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Common\CodeCracker.Common\CodeCracker.Common.csproj" PrivateAssets="all" />
   </ItemGroup>

@@ -1076,5 +1076,98 @@ public class Foo
 }";
             await VerifyCSharpHasNoDiagnosticsAsync(test.WrapInCSharpClass());
         }
+
+        [Fact]
+        public async Task NotWarningIfGuardedByArgumentNullExceptionThrowIfNull_FullyQualified()
+        {
+            var test = @"
+public static void Execute(System.Action action)
+{
+    System.ArgumentNullException.ThrowIfNull(action);
+    action();
+}";
+
+            await VerifyCSharpHasNoDiagnosticsAsync(test);
+        }
+
+        [Fact]
+        public async Task NotWarningIfGuardedByArgumentNullExceptionThrowIfNull_Qualified()
+        {
+            var test = @"
+using System;
+
+public static class C
+{
+    public static void Execute(Action action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        action();
+    }
+}";
+
+            await VerifyCSharpHasNoDiagnosticsAsync(test);
+        }
+
+        [Fact]
+        public async Task NotWarningIfGuardedByUsingStaticThrowIfNull()
+        {
+            var test = @"
+using static System.ArgumentNullException;
+
+public static class C
+{
+    public static void Execute(System.Action action)
+    {
+        ThrowIfNull(action);
+        action();
+    }
+}";
+
+            await VerifyCSharpHasNoDiagnosticsAsync(test);
+        }
+
+        [Fact]
+        public async Task WarningIfThrowIfNullGuardsDifferentSymbol()
+        {
+            var test = @"
+using System;
+
+public static class C
+{
+    public static void Execute(Action action, object other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+        action();
+    }
+}";
+
+            var expected = new DiagnosticResult(DiagnosticId.UseInvokeMethodToFireEvent.ToDiagnosticId(), DiagnosticSeverity.Warning)
+                .WithMessage(string.Format(UseInvokeMethodToFireEventAnalyzer.MessageFormat, "action"))
+                .WithLocation(9, 9); // keep column 9; line 11 for typical WrapInCSharpNamespace()
+
+            await VerifyCSharpDiagnosticAsync(test, expected);
+        }
+
+        [Fact]
+        public async Task WarningIfThrowIfNullIsAfterInvocation()
+        {
+            var test = @"
+using System;
+
+public static class C
+{
+    public static void Execute(Action action)
+    {
+        action();
+        ArgumentNullException.ThrowIfNull(action);
+    }
+}";
+
+            var expected = new DiagnosticResult(DiagnosticId.UseInvokeMethodToFireEvent.ToDiagnosticId(), DiagnosticSeverity.Warning)
+                .WithMessage(string.Format(UseInvokeMethodToFireEventAnalyzer.MessageFormat, "action"))
+                .WithLocation(8, 9);
+
+            await VerifyCSharpDiagnosticAsync(test, expected);
+        }
     }
 }

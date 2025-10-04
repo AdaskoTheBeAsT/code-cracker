@@ -4,14 +4,13 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.VisualBasic;
 
 namespace CodeCracker.Test
 {
     public static partial class VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix>
     {
-        public class Test : CodeFixTest<XUnitVerifier>
+        public class Test : CodeFixTest<DefaultVerifier>
         {
             public override string Language => LanguageNames.VisualBasic;
 

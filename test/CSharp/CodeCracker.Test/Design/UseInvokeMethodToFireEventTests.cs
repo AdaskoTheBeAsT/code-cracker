@@ -1169,5 +1169,41 @@ public static class C
 
             await VerifyCSharpDiagnosticAsync(test, expected);
         }
+
+        [Fact]
+        public async Task NotWarningInInternalMethodIfGuardedByThrowIfNull()
+        {
+            var test =
+                """
+                using System;
+                using System.Threading.Tasks;
+
+                public class C
+                {
+                    public async Task Process(ref string value, Func<Task> next)
+                    {
+                        ArgumentNullException.ThrowIfNull(next);
+                        
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            try
+                            {
+                                await next().ConfigureAwait(false);
+                            }
+                            finally
+                            {
+                                value = string.Empty;
+                            }
+                
+                            return;
+                        }
+                
+                        await next().ConfigureAwait(false);
+                    }
+                }
+                """;
+
+            await VerifyCSharpHasNoDiagnosticsAsync(test);
+        }
     }
 }

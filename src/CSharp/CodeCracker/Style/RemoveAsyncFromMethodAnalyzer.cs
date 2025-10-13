@@ -31,18 +31,35 @@ namespace CodeCracker.CSharp.Style
 
         private static void AnalyzeMethod(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsGenerated()) return;
+            if (context.IsGenerated())
+            {
+                return;
+            }
+
             var method = context.Node as MethodDeclarationSyntax;
-            if (!method.Identifier.Text.EndsWith("Async")) return;
-            if (method.Modifiers.Any(m => m.Text == "async")) return;
+            if (!method.Identifier.Text.EndsWith("Async"))
+            {
+                return;
+            }
+
+            if (method.Modifiers.Any(m => m.Text == "async"))
+            {
+                return;
+            }
 
             var returnType = context.SemanticModel.GetSymbolInfo(method.ReturnType).Symbol as INamedTypeSymbol;
             if (returnType != null)
             {
                 if (returnType.ToString() == "System.Threading.Tasks.Task" ||
-                    (returnType.IsGenericType && returnType.ConstructedFrom.ToString() == "System.Threading.Tasks.Task<TResult>"))
+                    returnType.ToString() == "System.Threading.Tasks.ValueTask" ||
+                    (returnType.IsGenericType &&
+                     (returnType.ConstructedFrom.ToString() == "System.Threading.Tasks.Task<TResult>" ||
+                      returnType.ConstructedFrom.ToString() == "System.Threading.Tasks.ValueTask<TResult>")))
+                {
                     return;
+                }
             }
+
             var diagnostic = Diagnostic.Create(Rule, method.Identifier.GetLocation(), method.Identifier.Text);
             context.ReportDiagnostic(diagnostic);
         }

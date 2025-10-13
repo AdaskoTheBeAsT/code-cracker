@@ -75,5 +75,35 @@ namespace CodeCracker.Test.CSharp.Style
     }";
             await VerifyCSharpFixAsync(source, fixtest);
         }
+
+        [Fact]
+        public async Task MethodReturningValueTaskWithAsyncTermination_HasNoDiagnostic()
+        {
+            const string source = @"
+    using System.Threading.Tasks;
+    namespace ConsoleApplication1
+    {
+        public class Foo
+        {
+            ValueTask TestAsync() => default;
+        }
+    }";
+            await VerifyCSharpHasNoDiagnosticsAsync(source);
+        }
+
+        [Fact]
+        public async Task MethodReturningGenericValueTaskWithAsyncTermination_HasNoDiagnostic()
+        {
+            const string source = @"
+    using System.Threading.Tasks;
+    namespace ConsoleApplication1
+    {
+        public class Foo
+        {
+            ValueTask<int> TestAsync() => default;
+        }
+    }";
+            await VerifyCSharpHasNoDiagnosticsAsync(source);
+        }
     }
 }

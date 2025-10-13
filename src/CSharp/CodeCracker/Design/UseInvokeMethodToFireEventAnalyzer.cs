@@ -125,8 +125,7 @@ namespace CodeCracker.CSharp.Design
             else if (equals.Left.IsKind(SyntaxKind.NullLiteralExpression) && equals.Right.IsKind(SyntaxKind.IdentifierName))
                 identifierSymbol = semanticModel.GetSymbolInfo(equals.Right).Symbol;
             else return false;
-            if (symbol.Equals(identifierSymbol)) return true;
-            return false;
+            return symbol.Equals(identifierSymbol);
         }
 
         private static bool HasArgumentNullExceptionThrowIfNullBeforeInvocation(
@@ -134,26 +133,23 @@ namespace CodeCracker.CSharp.Design
             SemanticModel semanticModel,
             ISymbol symbol)
         {
-            // Looks for a preceding call that guards the same symbol with:
-            //  System.ArgumentNullException.ThrowIfNull(symbol);
-            //  ArgumentNullException.ThrowIfNull(symbol);                (with using System;)
-            //  ThrowIfNull(symbol);                                     (with using static System.ArgumentNullException;)
-            //
-            // This implementation is intentionally simple and resilient to:
-            //  - Missing ThrowIfNull symbol (older target frameworks)
-            //  - Extra nesting / formatting
-            //  - Minimal test snippets (no wrapping class/namespace)
-
-            var block = invocation.FirstAncestorOfType<BlockSyntax>();
-            if (block == null) return false;
+            // Walk the entire containing method/constructor body if available; otherwise fall back
+            // to the outermost ancestor block (to support test snippets that are not wrapped in a type).
+            var method = invocation.FirstAncestorOfKind(SyntaxKind.MethodDeclaration, SyntaxKind.ConstructorDeclaration) as BaseMethodDeclarationSyntax;
+            BlockSyntax searchBlock = method?.Body;
+            if (searchBlock == null)
+            {
+                // Fallback: emulate previous behavior (scan the broadest block that still contains the invocation)
+                searchBlock = invocation.Ancestors().OfType<BlockSyntax>().LastOrDefault();
+                if (searchBlock == null) return false;
+            }
 
             var invocationStart = invocation.SpanStart;
 
-            // Detect a static using for ArgumentNullException (textual or semantic)
-            var root = block.SyntaxTree.GetRoot();
+            var root = searchBlock.SyntaxTree.GetRoot();
             bool hasUsingStaticArgNull =
                 root.DescendantNodes()
-                    .OfType<UsingDirectiveSyntax>()
+                    .OfType<UsingDirectiveSyntax>() // detect: using static System.ArgumentNullException;
                     .Any(u =>
                         u.StaticKeyword.Kind() == SyntaxKind.StaticKeyword &&
                         (u.Name.ToString() == "System.ArgumentNullException"
@@ -162,7 +158,6 @@ namespace CodeCracker.CSharp.Design
                              && ts.Name == nameof(ArgumentNullException)
                              && ts.ContainingNamespace?.ToDisplayString() == "System")));
 
-            // Fallback textual scan (covers cases where symbol resolution fails entirely)
             if (!hasUsingStaticArgNull)
             {
                 var fullText = root.GetText().ToString();
@@ -170,7 +165,8 @@ namespace CodeCracker.CSharp.Design
                     hasUsingStaticArgNull = true;
             }
 
-            foreach (var priorInvocation in block.DescendantNodes()
+            foreach (var priorInvocation in searchBlock
+                         .DescendantNodes()
                          .OfType<InvocationExpressionSyntax>()
                          .Where(i => i.SpanStart < invocationStart))
             {
@@ -188,7 +184,6 @@ namespace CodeCracker.CSharp.Design
 
             bool IsThrowIfNullGuard(InvocationExpressionSyntax candidate)
             {
-                // Get invoked simple name
                 var simpleName = candidate.Expression switch
                 {
                     IdentifierNameSyntax id => id.Identifier.Text,
@@ -197,26 +192,21 @@ namespace CodeCracker.CSharp.Design
                 };
                 if (simpleName != "ThrowIfNull") return false;
 
-                // Qualification rules
                 switch (candidate.Expression)
                 {
                     case IdentifierNameSyntax:
-                        // Must have using static
                         return hasUsingStaticArgNull;
 
                     case MemberAccessExpressionSyntax ma:
-                        // Collapse left side text (handles fully-qualified chain)
                         var left = ma.Expression.ToString();
                         if (left == "System.ArgumentNullException" || left == "ArgumentNullException")
                             return true;
 
-                        // Semantic fallback (in case of partial qualification or alias)
                         if (semanticModel.GetSymbolInfo(ma.Expression).Symbol is INamedTypeSymbol leftType &&
                             leftType.Name == nameof(ArgumentNullException) &&
                             leftType.ContainingNamespace?.ToDisplayString() == "System")
                             return true;
                         return false;
-
                     default:
                         return false;
                 }

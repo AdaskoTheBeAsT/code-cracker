@@ -1,15 +1,16 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.CodeAnalysis.Text;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CodeCracker.Test
 {
@@ -24,9 +25,11 @@ namespace CodeCracker.Test
         private static readonly MetadataReference RegexReference = MetadataReference.CreateFromFile(typeof(System.Text.RegularExpressions.Regex).Assembly.Location);
         private static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
         private static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
-        private static readonly MetadataReference JsonNetReference = MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location);
+        private static readonly PortableExecutableReference JsonNetReference = MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location);
         private static readonly MetadataReference SystemReference = MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location);
         private static readonly MetadataReference SystemComponentModelPrimitivesReference = MetadataReference.CreateFromFile(typeof(System.ComponentModel.INotifyPropertyChanged).Assembly.Location);
+        private static readonly MetadataReference SystemConsoleReference = MetadataReference.CreateFromFile(typeof(Console).Assembly.Location);
+        private static readonly MetadataReference SystemRuntimeReference = MetadataReference.CreateFromFile(typeof(System.Runtime.CompilerServices.DynamicAttribute).Assembly.Location);
 
         internal static readonly string DefaultFilePathPrefix = nameof(Test);
         internal static readonly string CSharpDefaultFileExt = "cs";
@@ -34,6 +37,27 @@ namespace CodeCracker.Test
         internal static readonly string CSharpDefaultFilePath = DefaultFilePathPrefix + 0 + "." + CSharpDefaultFileExt;
         internal static readonly string VisualBasicDefaultFilePath = DefaultFilePathPrefix + 0 + "." + VisualBasicDefaultExt;
         internal static readonly string TestProjectName = "TestProject";
+
+        private static ImmutableList<PortableExecutableReference> GetDefaultReferences()
+        {
+            // Trusted Platform Assemblies contain all runtime + framework assemblies actually loaded for the current process.
+            var tpa = (AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string)?
+                .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+
+            // If desired you can filter; here we take all managed DLLs except a few known satellite/resource patterns.
+            var runtimeRefs = tpa
+                .Where(p =>
+                    p.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) &&
+                    !p.Contains("resources", StringComparison.OrdinalIgnoreCase))
+                .Select(s=>MetadataReference.CreateFromFile(s))
+                .ToList();
+
+            // Ensure Newtonsoft.Json is present (NuGet package, not part of TPA).
+            // Using the existing JsonNetReference ensures compatibility.
+            runtimeRefs.Add(JsonNetReference);
+
+            return runtimeRefs.ToImmutableList();
+        }
 
         /// <summary>
         /// Given classes in the form of strings, their language, and an IDiagnosticAnlayzer to apply to it, return the diagnostics found in the string after converting it to a document.
@@ -178,13 +202,20 @@ namespace CodeCracker.Test
             var workspace = new AdhocWorkspace();
 #pragma warning restore CC0022
 
+            var metadataReferences = GetDefaultReferences();
+
             var projectInfo = ProjectInfo.Create(projectId, VersionStamp.Create(), TestProjectName,
                 TestProjectName, language,
                 parseOptions: parseOptions,
-                metadataReferences: ImmutableList.Create(
-                    CorlibReference, SystemCoreReference, RegexReference,
-                    CSharpSymbolsReference, CodeAnalysisReference, JsonNetReference,
-                    SystemReference, SystemComponentModelPrimitivesReference));
+                metadataReferences: metadataReferences);
+
+            /*
+            ImmutableList.Create(
+               CorlibReference, SystemCoreReference, RegexReference,
+               CSharpSymbolsReference, CodeAnalysisReference, JsonNetReference,
+               SystemReference, SystemComponentModelPrimitivesReference, SystemConsoleReference,
+               SystemRuntimeReference)
+            */
 
             workspace.AddProject(projectInfo);
 
@@ -203,7 +234,14 @@ namespace CodeCracker.Test
             return newProject;
         }
 
-        private static readonly Dictionary<string, ReportDiagnostic> diagOptions = Enumerable.Range(1, 1000).Select(i => $"CC{i:D4}").ToDictionary(id => id, id => ReportDiagnostic.Default);
+        private static readonly Dictionary<string, ReportDiagnostic> diagOptions = Enumerable.Range(1, 1000)
+            .Select(i => $"CC{i:D4}")
+            .ToDictionary(id => id, id => ReportDiagnostic.Default)
+            .Concat(new Dictionary<string, ReportDiagnostic>
+            {
+                ["CS1998"] = ReportDiagnostic.Warn // Async method lacks 'await' operators
+            })
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
         #endregion
 

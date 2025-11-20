@@ -46,7 +46,8 @@ namespace CodeCracker.CSharp.Refactoring
         {
             if (context.IsGenerated()) return;
             var invocation = (InvocationExpressionSyntax)context.Node;
-            if (invocation.Parent?.IsKind(SyntaxKind.ExpressionStatement) ?? true) return;
+            if (invocation.Parent == null) return;
+            if (invocation.Parent.IsKind(SyntaxKind.ExpressionStatement)) return;
             var diagnosticToRaise = GetCorrespondingDiagnostic(context.SemanticModel, invocation);
             if (diagnosticToRaise == null) return;
             var diagnostic = Diagnostic.Create(diagnosticToRaise, GetName(invocation).GetLocation());
@@ -86,23 +87,25 @@ namespace CodeCracker.CSharp.Refactoring
 
         private static bool OtherMethodExists(InvocationExpressionSyntax invocation, SimpleNameSyntax nameToCheck, SemanticModel semanticModel)
         {
-            var otherExpression = CreateExpressionWithNewName(invocation, nameToCheck);
-            var statement = invocation.FirstAncestorOrSelfThatIsAStatement();
-            SemanticModel speculativeModel;
-            if (statement != null)
-            {
-                var otherStatement = statement.ReplaceNode(invocation.Expression, otherExpression);
-                if (!semanticModel.TryGetSpeculativeSemanticModel(statement.SpanStart, otherStatement, out speculativeModel)) return false;
-            }
-            else
-            {
-                var arrow = (ArrowExpressionClauseSyntax)invocation.FirstAncestorOfKind(SyntaxKind.ArrowExpressionClause);
-                if (arrow == null) return false;
-                var otherArrow = arrow.ReplaceNode(invocation.Expression, otherExpression);
-                if (!semanticModel.TryGetSpeculativeSemanticModel(arrow.SpanStart, otherArrow, out speculativeModel)) return false;
-            }
-            var symbol = speculativeModel.GetSymbolInfo(speculativeModel.SyntaxTree.GetRoot().GetAnnotatedNodes(speculativeAnnotationDescription).First()).Symbol;
-            return symbol != null;
+            var memberAccess = invocation.Expression as MemberAccessExpressionSyntax;
+            if (memberAccess == null) return false;
+            
+            var methodSymbol = semanticModel.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
+            if (methodSymbol == null) return false;
+            
+            var receiverType = methodSymbol.ReceiverType;
+            if (receiverType == null) return false;
+            
+            var targetMethodName = nameToCheck.ToString();
+            var members = receiverType.GetMembers(targetMethodName);
+            
+            if (!members.Any()) return false;
+            
+            var targetMethod = members.OfType<IMethodSymbol>().FirstOrDefault(m => 
+                m.Parameters.Length == 1 && 
+                m.IsExtensionMethod == methodSymbol.IsExtensionMethod);
+            
+            return targetMethod != null;
         }
 
         public static ExpressionSyntax CreateExpressionWithNewName(InvocationExpressionSyntax invocation, SimpleNameSyntax nameToCheck)

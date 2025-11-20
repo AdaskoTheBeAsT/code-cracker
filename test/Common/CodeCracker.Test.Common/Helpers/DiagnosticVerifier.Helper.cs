@@ -26,6 +26,7 @@ namespace CodeCracker.Test
         private static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
         private static readonly MetadataReference JsonNetReference = MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location);
         private static readonly MetadataReference SystemReference = MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location);
+        private static readonly MetadataReference SystemComponentModelPrimitivesReference = MetadataReference.CreateFromFile(typeof(System.ComponentModel.INotifyPropertyChanged).Assembly.Location);
 
         internal static readonly string DefaultFilePathPrefix = nameof(Test);
         internal static readonly string CSharpDefaultFileExt = "cs";
@@ -183,7 +184,7 @@ namespace CodeCracker.Test
                 metadataReferences: ImmutableList.Create(
                     CorlibReference, SystemCoreReference, RegexReference,
                     CSharpSymbolsReference, CodeAnalysisReference, JsonNetReference,
-                    SystemReference));
+                    SystemReference, SystemComponentModelPrimitivesReference));
 
             workspace.AddProject(projectInfo);
 

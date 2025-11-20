@@ -31,6 +31,6 @@ namespace CodeCracker.CSharp.Design.InconsistentAccessibility
         }
 
         private static string ExtractParameterTypeFromDiagnosticMessage(Diagnostic diagnostic) =>
-            Regex.Match(diagnostic.GetMessage(CultureInfo.InvariantCulture), "Inconsistent accessibility: parameter type '(.*)' is less accessible than indexer '(.*)'").Groups[1].Value;
+            Regex.Match(diagnostic.GetMessage(CultureInfo.InvariantCulture), "Inconsistent accessibility: parameter type '(.*)' is less accessible than indexer or property '(.*)'").Groups[1].Value;
     }
 }

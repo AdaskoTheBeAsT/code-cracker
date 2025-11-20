@@ -41,6 +41,19 @@ namespace CodeCracker.CSharp.Refactoring
             var syntaxRoot = await document.GetSyntaxRootAsync(cancellationToken);
             var data = PropertyChangedEventArgsAnalyzerData.FromDiagnosticProperties(properties);
             var newSyntaxRoot = new PropertyChangedUnnecessaryAllocationRewriter(data, location.SourceSpan).Visit(syntaxRoot);
+            
+            if (newSyntaxRoot is CompilationUnitSyntax compilationUnit)
+            {
+                var isTypeNameQualified = data.FullTypeName.Contains(".");
+                var hasSystemComponentModel = compilationUnit.Usings.Any(u => u.Name.ToString() == "System.ComponentModel");
+                if (!isTypeNameQualified && !hasSystemComponentModel)
+                {
+                    newSyntaxRoot = compilationUnit.AddUsings(
+                        UsingDirective(ParseName("System.ComponentModel"))
+                        .WithTrailingTrivia(ElasticCarriageReturnLineFeed));
+                }
+            }
+            
             return document.WithSyntaxRoot(newSyntaxRoot);
         }
 

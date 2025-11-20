@@ -147,7 +147,7 @@ namespace CodeCracker.CSharp.Refactoring
         }
 
         public string StaticFieldIdentifierName(IEnumerable<string> nameHints) => nameHints.Contains(StaticFieldIdentifierNameProposition) ?
-                                                                                    CreateNewIdenfitierName(StaticFieldIdentifierNameProposition, 1, nameHints) : StaticFieldIdentifierNameProposition;
+                                                                                    CreateNewIdentifierName(StaticFieldIdentifierNameProposition, 1, nameHints) : StaticFieldIdentifierNameProposition;
 
         public MemberDeclarationSyntax PropertyChangedEventArgsStaticField(IEnumerable<string> nameHints)
         {
@@ -211,11 +211,36 @@ namespace CodeCracker.CSharp.Refactoring
 
         private static IdentifierNameSyntax FieldType(string type) => IdentifierName(type);
 
-        private static string CreateNewIdenfitierName(string oldName, int extension, IEnumerable<string> nameHints)
+        private static string CreateNewIdentifierName(string oldName, int extension, IEnumerable<string> nameHints)
         {
-            var number = int.Parse(new string(oldName.ToCharArray().Reverse().TakeWhile(char.IsNumber).DefaultIfEmpty('0').ToArray()));
-            var proposition = $"{oldName}{number + extension}";
-            return nameHints.Contains(proposition) ? CreateNewIdenfitierName(oldName, extension + 1, nameHints) : proposition;
+            if (oldName == null)
+            {
+                oldName = string.Empty;
+            }
+
+            // Find the start index of the trailing numeric suffix (if any)
+            var i = oldName.Length - 1;
+            while (i >= 0 && char.IsDigit(oldName[i]))
+            {
+                i--;
+            }
+
+            // Split into base name and numeric suffix (in correct order)
+            var baseName = oldName.Substring(0, i + 1);
+            var digits = oldName.Substring(i + 1);
+
+            // Parse the existing numeric suffix (default to 0 if none/invalid)
+            int current = 0;
+            if (!string.IsNullOrEmpty(digits))
+            {
+                int.TryParse(digits, out current);
+            }
+
+            // Propose next name and retry if it collides
+            var candidate = $"{baseName}{current + extension}";
+            return nameHints.Contains(candidate)
+                ? CreateNewIdentifierName(candidate, 1, nameHints) // increment by 1 on each retry
+                : candidate;
         }
 
         private class PropertyChangedCreationSyntaxAnalyzer : CSharpSyntaxWalker

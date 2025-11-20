@@ -61,7 +61,8 @@ Namespace Usage
             Try
                 JObject.Parse(json)
             Catch ex As Exception
-                Dim diag = Diagnostic.Create(Rule, literalParameter.GetLocation(), ex.InnerException.Message)
+                Dim message = If(ex.InnerException?.Message, ex.Message)
+                Dim diag = Diagnostic.Create(Rule, literalParameter.GetLocation(), message)
                 context.ReportDiagnostic(diag)
             End Try
         End Sub

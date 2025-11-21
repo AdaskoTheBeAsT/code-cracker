@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Threading;
@@ -14,7 +15,33 @@ using Microsoft.CodeAnalysis.Simplification;
 
 namespace CodeCracker.CSharp.Refactoring
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(InconsistentAccessibilityCodeFixProvider)), Shared]
+    /// <summary>
+    /// DEPRECATED: This code fix provider is deprecated and will be removed in a future version.
+    /// 
+    /// Reason for deprecation:
+    /// - The C# compiler already issues warning CS1998 for async methods without await operators
+    /// - Modern IDEs (Visual Studio, Rider, VS Code) provide built-in quick-fixes for CS1998
+    /// - The pattern of using async without await is increasingly rare in modern C# codebases
+    /// - Best practice is to not use the async modifier if there are no await expressions
+    /// 
+    /// Recommended alternatives:
+    /// - Use the built-in IDE quick-fixes for CS1998 warnings
+    /// - Manually remove the async keyword and return Task/Task&lt;T&gt; directly
+    /// - For simple cases, use Task.FromResult() or return the Task directly (task eliding)
+    /// 
+    /// Example modern patterns:
+    /// <code>
+    /// // Instead of: async Task&lt;int&gt; GetValue() { return 42; }
+    /// // Use: Task&lt;int&gt; GetValue() => Task.FromResult(42);
+    /// 
+    /// // Instead of: async Task&lt;Data&gt; GetData() { return await repository.GetAsync(); }
+    /// // Use: Task&lt;Data&gt; GetData() => repository.GetAsync();  // Task eliding
+    /// </code>
+    /// </summary>
+    [Obsolete("This code fix provider is deprecated. Modern IDEs provide built-in quick-fixes for CS1998. " +
+              "Use IDE quick-fixes or manually remove async keyword when there are no await expressions. " +
+              "This will be removed in a future version.", false)]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MakeMethodNonAsyncCodeFixProvider)), Shared]
     class MakeMethodNonAsyncCodeFixProvider : CodeFixProvider
     {
         internal const string AsyncMethodLacksAwaitCompilerWarningNumber = "CS1998";

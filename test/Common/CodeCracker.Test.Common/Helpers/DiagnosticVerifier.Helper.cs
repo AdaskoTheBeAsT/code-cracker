@@ -209,14 +209,6 @@ namespace CodeCracker.Test
                 parseOptions: parseOptions,
                 metadataReferences: metadataReferences);
 
-            /*
-            ImmutableList.Create(
-               CorlibReference, SystemCoreReference, RegexReference,
-               CSharpSymbolsReference, CodeAnalysisReference, JsonNetReference,
-               SystemReference, SystemComponentModelPrimitivesReference, SystemConsoleReference,
-               SystemRuntimeReference)
-            */
-
             workspace.AddProject(projectInfo);
 
             var count = 0;
@@ -228,7 +220,24 @@ namespace CodeCracker.Test
             }
 
             var project = workspace.CurrentSolution.GetProject(projectId);
-            var newCompilationOptions = project.CompilationOptions.WithSpecificDiagnosticOptions(diagOptions);
+            
+            // Create compilation options with diagnostic options and warning level
+            CompilationOptions newCompilationOptions;
+            if (language == LanguageNames.CSharp)
+            {
+                var csharpOptions = (CSharpCompilationOptions)project.CompilationOptions;
+                newCompilationOptions = csharpOptions
+                    .WithSpecificDiagnosticOptions(diagOptions)
+                    .WithGeneralDiagnosticOption(ReportDiagnostic.Default)
+                    .WithWarningLevel(4);  // Enable all warnings including CS1998
+            }
+            else
+            {
+                newCompilationOptions = project.CompilationOptions
+                    .WithSpecificDiagnosticOptions(diagOptions)
+                    .WithGeneralDiagnosticOption(ReportDiagnostic.Default);
+            }
+            
             var newSolution = workspace.CurrentSolution.WithProjectCompilationOptions(projectId, newCompilationOptions);
             var newProject = newSolution.GetProject(projectId);
             return newProject;

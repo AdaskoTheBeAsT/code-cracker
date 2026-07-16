@@ -71,7 +71,10 @@ namespace CodeCracker.Test
         /// <returns>The compiler diagnostics that were found in the code</returns>
         private static async Task<IEnumerable<Diagnostic>> GetCompilerDiagnosticsAsync(Document document)
         {
-            return (await document.GetSemanticModelAsync().ConfigureAwait(true)).GetDiagnostics();
+            var syntaxTree = await document.GetSyntaxTreeAsync().ConfigureAwait(true);
+            var compilation = await document.Project.GetCompilationAsync().ConfigureAwait(true);
+            return compilation.GetDiagnostics()
+                .Where(diagnostic => diagnostic.Location == Location.None || diagnostic.Location.SourceTree == syntaxTree);
         }
     }
 }

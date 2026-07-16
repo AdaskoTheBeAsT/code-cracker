@@ -66,20 +66,8 @@ namespace CodeCracker.CSharp.Usage
             // Valid address? then no diagnostic
             if (IPAddress.TryParse(ipText, out _)) return;
 
-            // Need the actual framework error message (tests compare it)
-            string message;
-            try
-            {
-                _ = IPAddress.Parse(ipText); // should throw
-                return;                       // defensive
-            }
-            catch (Exception ex)
-            {
-                message = ex.Message;
-            }
-
             // Report at the literal so column matches expected test (quote position)
-            context.ReportDiagnostic(Diagnostic.Create(Rule, argLiteral.GetLocation(), message));
+            context.ReportDiagnostic(Diagnostic.Create(Rule, argLiteral.GetLocation(), "An invalid IP address was specified."));
         }
 
         private static bool IsLikelyIPAddressParseSyntax(ExpressionSyntax expr)

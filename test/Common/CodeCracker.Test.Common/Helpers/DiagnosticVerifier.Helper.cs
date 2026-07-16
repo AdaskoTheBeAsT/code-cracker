@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -80,6 +81,12 @@ namespace CodeCracker.Test
         /// <returns>An IEnumerable of Diagnostics that surfaced in teh source code, sorted by Location</returns>
         protected async static Task<Diagnostic[]> GetSortedDiagnosticsFromDocumentsAsync(DiagnosticAnalyzer analyzer, Document[] documents)
         {
+            var previousCulture = CultureInfo.CurrentCulture;
+            var previousUICulture = CultureInfo.CurrentUICulture;
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            try
+            {
             var projects = new HashSet<Project>();
             foreach (var document in documents)
                 projects.Add(document.Project);
@@ -110,6 +117,12 @@ namespace CodeCracker.Test
             }
             var results = SortDiagnostics(diagnostics);
             return results;
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = previousCulture;
+                CultureInfo.CurrentUICulture = previousUICulture;
+            }
         }
 
         /// <param name="diags">The compiler diagnostics at a given compilation.</param>

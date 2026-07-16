@@ -1182,7 +1182,9 @@ using (var mem = new System.IO.MemoryStream())
                         if (DateTime.Now.Second % 3 == 0)
                         {
                             Console.WriteLine(1);
-                        } ((IDisposable)m).Dispose();
+                        }
+
+                        ((IDisposable)m).Dispose();
                     }
                 }
                 class Disposable : IDisposable
@@ -1246,7 +1248,9 @@ using (var mem = new System.IO.MemoryStream())
                         if (DateTime.Now.Second % 3 == 0)
                         {
                             Console.WriteLine(1);
-                        } ((IDisposable)m).Dispose();
+                        }
+
+                        ((IDisposable)m).Dispose();
                     }
                 }
                 class Disposable : IDisposable

@@ -21,7 +21,9 @@ Namespace Usage
         Public Overrides Function RegisterCodeFixesAsync(context As CodeFixContext) As Task
             Dim diagnostic = context.Diagnostics.First()
 
-            Dim parameters = diagnostic.Properties.Where(Function(p) p.Key.StartsWith("param"))
+            Dim parameters = diagnostic.Properties.
+                Where(Function(p) p.Key.StartsWith("param", StringComparison.Ordinal)).
+                OrderBy(Function(p) p.Key, StringComparer.Ordinal)
             For Each param In parameters
                 Dim message = $"Use '{param}'"
                 context.RegisterCodeFix(CodeAction.Create(message, Function(c) FixParamAsync(context.Document, diagnostic, param.Value, c), NameOf(ArgumentExceptionCodeFixProvider)), diagnostic)

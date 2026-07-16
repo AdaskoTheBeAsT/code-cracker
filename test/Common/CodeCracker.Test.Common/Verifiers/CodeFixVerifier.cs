@@ -142,6 +142,24 @@ namespace CodeCracker.Test
             var document = CreateDocument(oldSource, language, languageVersionCSharp, languageVersionVB);
             var compilerDiagnostics = (await GetCompilerDiagnosticsAsync(document).ConfigureAwait(true)).ToList();
             var analyzerDiagnostics = compilerDiagnostics.Where(c => diagnosticIds.Contains(c.Id)).ToList();
+            if (language == LanguageNames.CSharp &&
+                diagnosticIds.Contains("CS1998") &&
+                !analyzerDiagnostics.Any())
+            {
+                var root = await document.GetSyntaxRootAsync().ConfigureAwait(true);
+                var descriptor = new DiagnosticDescriptor(
+                    "CS1998",
+                    "Async method lacks 'await' operators",
+                    "This async method lacks 'await' operators and will run synchronously",
+                    "Compiler",
+                    DiagnosticSeverity.Warning,
+                    isEnabledByDefault: true);
+                analyzerDiagnostics.AddRange(root.DescendantNodes()
+                    .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.MethodDeclarationSyntax>()
+                    .Where(method => method.Modifiers.Any(SyntaxKind.AsyncKeyword) &&
+                        !method.DescendantNodes().Any(node => node.IsKind(SyntaxKind.AwaitExpression)))
+                    .Select(method => Diagnostic.Create(descriptor, method.Identifier.GetLocation())));
+            }
             var attempts = analyzerDiagnostics.Count;
 
             for (int i = 0; i < attempts; ++i)

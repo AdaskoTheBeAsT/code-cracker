@@ -87,25 +87,25 @@ namespace CodeCracker.CSharp.Refactoring
 
         private static bool OtherMethodExists(InvocationExpressionSyntax invocation, SimpleNameSyntax nameToCheck, SemanticModel semanticModel)
         {
-            var memberAccess = invocation.Expression as MemberAccessExpressionSyntax;
-            if (memberAccess == null) return false;
-            
-            var methodSymbol = semanticModel.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
-            if (methodSymbol == null) return false;
-            
-            var receiverType = methodSymbol.ReceiverType;
-            if (receiverType == null) return false;
-            
-            var targetMethodName = nameToCheck.ToString();
-            var members = receiverType.GetMembers(targetMethodName);
-            
-            if (!members.Any()) return false;
-            
-            var targetMethod = members.OfType<IMethodSymbol>().FirstOrDefault(m => 
-                m.Parameters.Length == 1 && 
-                m.IsExtensionMethod == methodSymbol.IsExtensionMethod);
-            
-            return targetMethod != null;
+            var otherExpression = CreateExpressionWithNewName(invocation, nameToCheck);
+            var statement = invocation.FirstAncestorOrSelfThatIsAStatement();
+            SemanticModel speculativeModel;
+            if (statement != null)
+            {
+                var otherStatement = statement.ReplaceNode(invocation.Expression, otherExpression);
+                if (!semanticModel.TryGetSpeculativeSemanticModel(statement.SpanStart, otherStatement, out speculativeModel)) return false;
+            }
+            else
+            {
+                var arrow = (ArrowExpressionClauseSyntax)invocation.FirstAncestorOfKind(SyntaxKind.ArrowExpressionClause);
+                if (arrow == null) return false;
+                var otherArrow = arrow.ReplaceNode(invocation.Expression, otherExpression);
+                if (!semanticModel.TryGetSpeculativeSemanticModel(arrow.SpanStart, otherArrow, out speculativeModel)) return false;
+            }
+            var annotatedNode = speculativeModel.SyntaxTree.GetRoot()
+                .GetAnnotatedNodes(speculativeAnnotationDescription)
+                .First();
+            return speculativeModel.GetSymbolInfo(annotatedNode).Symbol != null;
         }
 
         public static ExpressionSyntax CreateExpressionWithNewName(InvocationExpressionSyntax invocation, SimpleNameSyntax nameToCheck)

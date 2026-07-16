@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.Immutable
-Imports System.Reflection
 Imports CodeCracker.VisualBasic.Usage.MethodAnalyzers
 Imports Microsoft.CodeAnalysis
 Imports Microsoft.CodeAnalysis.Diagnostics
@@ -37,11 +36,15 @@ Public Class IPAddressAnalyzer
         If (context.IsGenerated()) Then Return
         Dim method As New MethodInformation("Parse",
                                             "Public Shared Overloads Function Parse(ipString As String) As System.Net.IPAddress",
-                                            Sub(args) parseMethodInfo.Value.Invoke(Nothing, {args(0).ToString()}))
+                                            AddressOf ValidateIPAddress)
         Dim checker = New methodchecker(context, Rule)
         checker.AnalyzeMethod(method)
     End Sub
 
-    Private Shared ReadOnly objectType As New Lazy(Of Type)(Function() System.Type.GetType("System.Net.IPAddress, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"))
-    Private Shared ReadOnly parseMethodInfo As New Lazy(Of MethodInfo)(Function() objectType.Value.GetRuntimeMethod("Parse", {GetType(String)}))
+    Private Shared Sub ValidateIPAddress(arguments As List(Of Object))
+        Dim address As System.Net.IPAddress = Nothing
+        If Not System.Net.IPAddress.TryParse(arguments(0).ToString(), address) Then
+            Throw New FormatException("An invalid IP address was specified.")
+        End If
+    End Sub
 End Class

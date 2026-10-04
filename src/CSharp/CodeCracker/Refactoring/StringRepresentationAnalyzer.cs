@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports string literals that can switch between regular and verbatim representations.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class StringRepresentationAnalyzer : DiagnosticAnalyzer
     {
@@ -29,8 +32,10 @@ namespace CodeCracker.CSharp.Refactoring
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.StringRepresentation_VerbatimString));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(RegularStringRule, VerbatimStringRule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.StringLiteralExpression);
 
         private static void Analyzer(SyntaxNodeAnalysisContext context)

@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports mismatches between composite format items and supplied arguments.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class StringFormatArgsAnalyzer : DiagnosticAnalyzer
     {
@@ -37,8 +40,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.StringFormatArgs_InvalidArgs));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(ExtraArgs, InvalidArgs);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.InvocationExpression);
 

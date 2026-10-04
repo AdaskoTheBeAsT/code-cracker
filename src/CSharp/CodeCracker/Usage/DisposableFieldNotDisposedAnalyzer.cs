@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports disposable fields that are not disposed by their containing type.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DisposableFieldNotDisposedAnalyzer : DiagnosticAnalyzer
     {
@@ -35,8 +38,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.DisposableFieldNotDisposed_Created));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(RuleForCreated, RuleForReturned);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
 
         private static void AnalyzeField(SymbolAnalysisContext context)

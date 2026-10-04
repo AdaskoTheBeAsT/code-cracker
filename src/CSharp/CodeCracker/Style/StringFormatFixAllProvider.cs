@@ -8,11 +8,18 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Applies fixes across a document, project, or solution to replace eligible string.Format calls with interpolated strings.
+    /// </summary>
     public sealed class StringFormatFixAllProvider : FixAllProvider
     {
         private static readonly SyntaxAnnotation stringFormatAnnotation = new SyntaxAnnotation(nameof(StringFormatFixAllProvider));
         private StringFormatFixAllProvider() { }
+        /// <summary>
+        /// The shared provider used to apply this code fix across a document, project, or solution.
+        /// </summary>
         public static readonly StringFormatFixAllProvider Instance = new StringFormatFixAllProvider();
+        /// <inheritdoc/>
         public override Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
         {
             switch (fixAllContext.Scope)

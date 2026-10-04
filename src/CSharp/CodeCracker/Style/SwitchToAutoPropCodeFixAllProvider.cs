@@ -9,11 +9,18 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Applies fixes across a document, project, or solution to replace eligible field-backed properties with auto-properties.
+    /// </summary>
     public sealed class SwitchToAutoPropCodeFixAllProvider : FixAllProvider
     {
         private SwitchToAutoPropCodeFixAllProvider() { }
 
+        /// <summary>
+        /// The shared provider used to apply this code fix across a document, project, or solution.
+        /// </summary>
         public static readonly SwitchToAutoPropCodeFixAllProvider Instance = new SwitchToAutoPropCodeFixAllProvider();
+        /// <inheritdoc/>
         public override Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
         {
             switch (fixAllContext.Scope)

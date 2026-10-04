@@ -12,13 +12,19 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to convert eligible static extension method calls to extension-call syntax.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(CallExtensionMethodAsExtensionCodeFixProvider)), Shared]
     public class CallExtensionMethodAsExtensionCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.CallExtensionMethodAsExtension.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

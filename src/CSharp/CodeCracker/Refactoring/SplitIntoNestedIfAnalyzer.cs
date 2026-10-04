@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports if conditions that can be split into nested if statements.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class SplitIntoNestedIfAnalyzer : DiagnosticAnalyzer
     {
@@ -22,8 +25,10 @@ namespace CodeCracker.CSharp.Refactoring
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.SplitIntoNestedIf));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.IfStatement);
 

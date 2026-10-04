@@ -11,14 +11,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Performance
 {
+    /// <summary>
+    /// Provides fixes to replace eligible instance Regex.IsMatch calls with static calls.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseStaticRegexIsMatchCodeFixProvider)), Shared]
     public class UseStaticRegexIsMatchCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.UseStaticRegexIsMatch.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

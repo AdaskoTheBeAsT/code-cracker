@@ -11,15 +11,21 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to restrict auto-property setter accessibility.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(PropertyPrivateSetCodeFixProvider)), Shared]
     public class PropertyPrivateSetCodeFixProvider : CodeFixProvider
     {
         private enum FixType { PrivateFix, ProtectedFix }
 
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.PropertyPrivateSet.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

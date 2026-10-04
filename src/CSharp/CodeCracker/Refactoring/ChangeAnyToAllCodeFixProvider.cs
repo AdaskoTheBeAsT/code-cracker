@@ -13,14 +13,20 @@ using Microsoft.CodeAnalysis.Formatting;
 namespace CodeCracker.CSharp.Refactoring
 {
 
+    /// <summary>
+    /// Provides fixes to convert between Any and All calls while negating the predicate and result.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ChangeAnyToAllCodeFixProvider)), Shared]
     public class ChangeAnyToAllCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.ChangeAnyToAll.ToDiagnosticId(), DiagnosticId.ChangeAllToAny.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

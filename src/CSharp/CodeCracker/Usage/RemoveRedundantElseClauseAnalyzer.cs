@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports empty else clauses.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class RemoveRedundantElseClauseAnalyzer : DiagnosticAnalyzer
     {
@@ -24,8 +27,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.RemoveRedundantElseClause));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.ElseClause);
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)

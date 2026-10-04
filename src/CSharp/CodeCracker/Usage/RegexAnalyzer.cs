@@ -7,6 +7,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports invalid constant regular expression patterns.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class RegexAnalyzer : DiagnosticAnalyzer
     {
@@ -25,8 +28,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.Regex));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.InvocationExpression);
 

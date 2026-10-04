@@ -11,16 +11,26 @@ using System.Threading;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Provides a code fix that orders type members according to StyleCop conventions.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StyleCopAllowMembersOrderingCodeFixProvider)), Shared]
     public class StyleCopAllowMembersOrderingCodeFixProvider : BaseAllowMembersOrderingCodeFixProvider
     {
+        /// <summary>
+        /// Initializes a provider that orders members according to StyleCop conventions.
+        /// </summary>
         public StyleCopAllowMembersOrderingCodeFixProvider() :
             base("Order {0}'s members following StyleCop patterns")
         { }
 
+        /// <inheritdoc/>
         protected override IComparer<MemberDeclarationSyntax> GetMemberDeclarationComparer(Document d, CancellationToken c) =>
             new StyleCopMembersComparer();
 
+        /// <summary>
+        /// Compares members by declaration kind, accessibility, modifiers, and name using StyleCop conventions.
+        /// </summary>
         public class StyleCopMembersComparer : IComparer<MemberDeclarationSyntax>
         {
             readonly Dictionary<Type, int> typeRank = new Dictionary<Type, int>
@@ -55,6 +65,7 @@ namespace CodeCracker.CSharp.Refactoring
                 { SyntaxKind.PrivateKeyword,     2 },
             };
 
+            /// <inheritdoc/>
             public int Compare(MemberDeclarationSyntax x, MemberDeclarationSyntax y)
             {
                 if (x == null && y == null) return 0;

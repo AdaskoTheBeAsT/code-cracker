@@ -15,16 +15,22 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Provides fixes to store constructor parameters in existing or newly introduced fields.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(IntroduceFieldFromConstructorCodeFixProvider)), Shared]
     public sealed class IntroduceFieldFromConstructorCodeFixProvider : CodeFixProvider, IFixDocumentInternalsOnly
     {
         private static readonly FixAllProvider FixAllProvider = new DocumentCodeFixProviderAll(Resources.IntroduceFieldFromConstructorCodeFixProvider_Title);
         private static readonly string MessageFormat = Resources.IntroduceFieldFromConstructorCodeFixProvider_MessageFormat;
 
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.IntroduceFieldFromConstructor.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => FixAllProvider;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -33,6 +39,13 @@ namespace CodeCracker.CSharp.Refactoring
             return Task.FromResult(0);
         }
 
+        /// <summary>
+        /// Stores the constructor parameter identified by the supplied node in an existing or newly introduced field.
+        /// </summary>
+        /// <param name="nodeWithDiagnostic">The parameter node or a node within its constructor parameter declaration.</param>
+        /// <param name="document">The document containing the constructor.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task returning the document with the field assignment and any required field declaration.</returns>
         public async Task<Document> FixDocumentAsync(SyntaxNode nodeWithDiagnostic, Document document, CancellationToken cancellationToken)
         {
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
@@ -43,6 +56,13 @@ namespace CodeCracker.CSharp.Refactoring
             return document.WithSyntaxRoot(newRoot);
         }
 
+        /// <summary>
+        /// Stores the diagnosed constructor parameter in a field.
+        /// </summary>
+        /// <param name="document">The document containing the target syntax.</param>
+        /// <param name="diagnostic">The diagnostic identifying the target declaration or expression.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task returning the document with the field assignment and any required field declaration.</returns>
         public async Task<Document> IntroduceFieldFromConstructorDocumentAsync(Document document, Diagnostic diagnostic, CancellationToken cancellationToken)
         {
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
@@ -51,6 +71,13 @@ namespace CodeCracker.CSharp.Refactoring
             return await FixDocumentAsync(nodeWithDiagnostic, document, cancellationToken);
         }
 
+        /// <summary>
+        /// Adds a constructor assignment to an existing matching field or introduces a private readonly field.
+        /// </summary>
+        /// <param name="root">The syntax root containing the target declaration or expression.</param>
+        /// <param name="constructorStatement">The constructor in which to store the parameter value.</param>
+        /// <param name="parameter">The parameter to transform.</param>
+        /// <returns>The syntax root with the constructor assignment and any required field declaration.</returns>
         public static SyntaxNode IntroduceFieldFromConstructor(SyntaxNode root, ConstructorDeclarationSyntax constructorStatement, ParameterSyntax parameter)
         {
             // There are no constructors in interfaces, therefore all types remaining type (class and struct) are fine.

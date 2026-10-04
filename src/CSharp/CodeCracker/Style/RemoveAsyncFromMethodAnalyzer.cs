@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports nonasynchronous methods whose names end with Async.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class RemoveAsyncFromMethodAnalyzer : DiagnosticAnalyzer
     {
@@ -25,8 +28,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.RemoveAsyncFromMethod));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeMethod, SyntaxKind.MethodDeclaration);
 
         private static void AnalyzeMethod(SyntaxNodeAnalysisContext context)

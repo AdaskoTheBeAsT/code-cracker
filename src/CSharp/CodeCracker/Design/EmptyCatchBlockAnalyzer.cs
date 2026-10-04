@@ -7,6 +7,9 @@ using CodeCracker.Properties;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Reports empty catch blocks that silently swallow exceptions.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class EmptyCatchBlockAnalyzer : DiagnosticAnalyzer
     {
@@ -25,8 +28,10 @@ namespace CodeCracker.CSharp.Design
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.EmptyCatchBlock));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.CatchClause);
 

@@ -13,16 +13,22 @@ using System.Threading.Tasks;
 namespace CodeCracker.CSharp.Refactoring
 {
 
+    /// <summary>
+    /// Provides fixes to split combined conditions into nested if statements.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SplitIntoNestedIfCodeFixProvider)), Shared]
     public class SplitIntoNestedIfCodeFixProvider : CodeFixProvider
     {
         internal const string MessageFormat = "Split into nested ifs";
 
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.SplitIntoNestedIf.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => SplitIntoNestedIfFixAllProvider.Instance;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

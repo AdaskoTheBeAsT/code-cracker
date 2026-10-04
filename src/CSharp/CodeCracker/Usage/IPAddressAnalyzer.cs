@@ -10,6 +10,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports invalid constant IP address strings passed to IP address parsing APIs.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class IPAddressAnalyzer : DiagnosticAnalyzer
     {
@@ -30,8 +33,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.IPAddress));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.InvocationExpression);
 
         private static void Analyzer(SyntaxNodeAnalysisContext context)

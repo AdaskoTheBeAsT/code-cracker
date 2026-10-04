@@ -10,14 +10,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to remove unused private methods.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RemovePrivateMethodNeverUsedCodeFixProvider)), Shared]
     public class RemovePrivateMethodNeverUsedCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.RemovePrivateMethodNeverUsed.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

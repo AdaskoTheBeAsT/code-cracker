@@ -8,6 +8,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Reports switch statements without a default section.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class SwitchWithoutDefaultAnalyzer : DiagnosticAnalyzer
     {
@@ -23,8 +26,10 @@ namespace CodeCracker.CSharp.Design
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.SwitchCaseWithoutDefault));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.SwitchStatement);
 
         private static void Analyzer(SyntaxNodeAnalysisContext context)

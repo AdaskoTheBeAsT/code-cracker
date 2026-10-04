@@ -10,12 +10,17 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to remove empty else clauses.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RemoveRedundantElseClauseCodeFixProvider)), Shared]
     public class RemoveRedundantElseClauseCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.RemoveRedundantElseClause.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

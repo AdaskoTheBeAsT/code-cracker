@@ -11,14 +11,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to remove the Async suffix from nonasynchronous method names.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RemoveAsyncFromMethodCodeFixProvider)), Shared]
     public class RemoveAsyncFromMethodCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.RemoveAsyncFromMethod.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

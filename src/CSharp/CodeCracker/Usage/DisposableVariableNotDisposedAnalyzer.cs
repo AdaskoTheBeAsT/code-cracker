@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports created disposable objects that are not disposed.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DisposableVariableNotDisposedAnalyzer : DiagnosticAnalyzer
     {
@@ -16,6 +19,9 @@ namespace CodeCracker.CSharp.Usage
         internal const string Category = SupportedCategories.Usage;
         const string Description = "When a disposable object is created it should be disposed as soon as possible.\n" +
             "This warning will appear if you create a disposable object and don't store, return or dispose it.";
+        /// <summary>
+        /// The diagnostic property key indicating that automatic disposal fixes are unavailable.
+        /// </summary>
         public const string cantFix = "cantFix";
         internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId.DisposableVariableNotDisposed.ToDiagnosticId(),
@@ -27,8 +33,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.DisposableVariableNotDisposed));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeObjectCreation, SyntaxKind.ObjectCreationExpression);
 
         private static void AnalyzeObjectCreation(SyntaxNodeAnalysisContext context)

@@ -12,14 +12,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to replace eligible null checks with conditional access.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ExistenceOperatorCodeFixProvider)), Shared]
     public class ExistenceOperatorCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.ExistenceOperator.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

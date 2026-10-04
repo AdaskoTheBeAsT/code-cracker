@@ -13,18 +13,33 @@ using System.Threading;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Provides fixes to convert string literals between regular and verbatim representations.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StringRepresentationCodeFixProvider)), Shared]
     public class StringRepresentationCodeFixProvider : CodeFixProvider
     {
+        /// <summary>
+        /// The base equivalence-key prefix for string representation code actions.
+        /// </summary>
         public const string Id = nameof(StringRepresentationCodeFixProvider);
+        /// <summary>
+        /// The equivalence key for converting a verbatim string to a regular string.
+        /// </summary>
         public const string ToRegularId = Id + "ToRegularString";
+        /// <summary>
+        /// The equivalence key for converting a regular string to a verbatim string.
+        /// </summary>
         public const string ToVerbatimId = Id + "ToVerbatimString";
 
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.StringRepresentation_RegularString.ToDiagnosticId(), DiagnosticId.StringRepresentation_VerbatimString.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

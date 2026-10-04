@@ -356,12 +356,16 @@ class TypeName
 {
     //comment 1
     private int i = 0;//comment 2
+
+    public int Increment() => ++i;
 }";
             const string fixtest = @"
 class TypeName
 {
     //comment 1
     private int i;//comment 2
+
+    public int Increment() => ++i;
 }";
             await VerifyCSharpFixAsync(source, fixtest);
         }
@@ -374,12 +378,16 @@ class TypeName
 {
     //comment 1
     private int i, j, k = 0;//comment 2
+
+    public int Increment() => ++i + ++j + ++k;
 }";
             const string fixtest = @"
 class TypeName
 {
     //comment 1
     private int i, j, k;//comment 2
+
+    public int Increment() => ++i + ++j + ++k;
 }";
             await VerifyCSharpFixAsync(source, fixtest);
         }
@@ -398,8 +406,12 @@ class TypeName
         //comment 4
         private int k = 0;//comment 5
         private int l = 0;//comment 6
+
+        public int Increment() => ++k + ++l;
     }
     private int m = 0;//comment 7
+
+    public int Increment() => ++i + ++j + ++m;
 }";
             const string fixtest = @"
 class TypeName
@@ -412,8 +424,12 @@ class TypeName
         //comment 4
         private int k;//comment 5
         private int l;//comment 6
+
+        public int Increment() => ++k + ++l;
     }
     private int m;//comment 7
+
+    public int Increment() => ++i + ++j + ++m;
 }";
             await VerifyCSharpFixAllAsync(source, fixtest);
         }

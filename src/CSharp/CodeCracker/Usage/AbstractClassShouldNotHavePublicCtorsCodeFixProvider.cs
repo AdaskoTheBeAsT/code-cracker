@@ -11,15 +11,21 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to make public constructors on abstract classes protected.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AbstractClassShouldNotHavePublicCtorsCodeFixProvider)), Shared]
 
     public class AbstractClassShouldNotHavePublicCtorsCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.AbstractClassShouldNotHavePublicCtors.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

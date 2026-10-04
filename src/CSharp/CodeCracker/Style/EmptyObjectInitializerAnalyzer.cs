@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports empty object initializers.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class EmptyObjectInitializerAnalyzer : DiagnosticAnalyzer
     {
@@ -25,8 +28,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.EmptyObjectInitializer));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.ObjectCreationExpression);
 

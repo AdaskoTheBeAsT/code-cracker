@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports string.Empty references that can use empty string literals.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UseEmptyStringAnalyzer : DiagnosticAnalyzer
     {
@@ -28,8 +31,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.UseEmptyString));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(AnalyzeNodeVariableDeclaration, SyntaxKind.SimpleMemberAccessExpression);
 

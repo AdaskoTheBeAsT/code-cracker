@@ -14,6 +14,9 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports PropertyChangedEventArgs allocations that can be cached.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class PropertyChangedEventArgsUnnecessaryAllocationAnalyzer : DiagnosticAnalyzer
     {
@@ -38,8 +41,10 @@ namespace CodeCracker.CSharp.Refactoring
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.PropertyChangedEventArgsUnnecessaryAllocation));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.RegisterSyntaxNodeAction(LanguageVersion.CSharp6, PropertyChangedCreation, SyntaxKind.ObjectCreationExpression);
@@ -110,6 +115,9 @@ namespace CodeCracker.CSharp.Refactoring
         }
     }
 
+    /// <summary>
+    /// Stores event argument creation details used to generate a reusable static field.
+    /// </summary>
     public class PropertyChangedEventArgsAnalyzerData
     {
         private const string ArgumentKeyName = "Argument";
@@ -118,10 +126,25 @@ namespace CodeCracker.CSharp.Refactoring
         private const string TypeKeyName = "Type";
         private const string SuffixAllProperties = "AllProperties";
 
+        /// <summary>
+        /// The event argument type name as written in the creation expression.
+        /// </summary>
         public readonly string FullTypeName;
+        /// <summary>
+        /// The property-name argument text or the identifier used in a nameof expression.
+        /// </summary>
         public readonly string ArgumentName;
+        /// <summary>
+        /// Indicates whether the creation expression uses a null property-name argument.
+        /// </summary>
         public readonly bool ArgumentIsNullLiteral;
+        /// <summary>
+        /// Indicates whether the creation expression uses a nameof property-name argument.
+        /// </summary>
         public readonly bool ArgumentIsNameofExpression;
+        /// <summary>
+        /// The proposed identifier for the cached event argument field, populated when diagnostic properties are restored.
+        /// </summary>
         public readonly string StaticFieldIdentifierNameProposition;
 
         private PropertyChangedEventArgsAnalyzerData(string fullTypeName, string argumentName, string isNullLiteral, string isNameof)
@@ -134,6 +157,11 @@ namespace CodeCracker.CSharp.Refactoring
             StaticFieldIdentifierNameProposition = $"PropertyChangedEventArgsFor{SuffixForStaticInstance()}";
         }
 
+        /// <summary>
+        /// Extracts the event argument type and property-name argument from an object creation expression.
+        /// </summary>
+        /// <param name="propertyChangedInstanceCreationExpr">The PropertyChangedEventArgs object creation expression to inspect.</param>
+        /// <exception cref="ArgumentNullException">The creation expression is null.</exception>
         public PropertyChangedEventArgsAnalyzerData(ObjectCreationExpressionSyntax propertyChangedInstanceCreationExpr)
         {
             if (propertyChangedInstanceCreationExpr == null)
@@ -146,9 +174,19 @@ namespace CodeCracker.CSharp.Refactoring
             ArgumentIsNameofExpression = analyzer.NameofExpressionFound;
         }
 
+        /// <summary>
+        /// Chooses a static field identifier that does not collide with existing name hints.
+        /// </summary>
+        /// <param name="nameHints">The existing identifiers to avoid when choosing a field name.</param>
+        /// <returns>The proposed field identifier, with a numeric suffix if needed.</returns>
         public string StaticFieldIdentifierName(IEnumerable<string> nameHints) => nameHints.Contains(StaticFieldIdentifierNameProposition) ?
                                                                                     CreateNewIdentifierName(StaticFieldIdentifierNameProposition, 1, nameHints) : StaticFieldIdentifierNameProposition;
 
+        /// <summary>
+        /// Creates a private static readonly field that caches the represented event arguments.
+        /// </summary>
+        /// <param name="nameHints">The existing identifiers to avoid when choosing a field name.</param>
+        /// <returns>The initialized field declaration using an available identifier.</returns>
         public MemberDeclarationSyntax PropertyChangedEventArgsStaticField(IEnumerable<string> nameHints)
         {
             return FieldDeclaration(List<AttributeListSyntax>(),
@@ -156,6 +194,10 @@ namespace CodeCracker.CSharp.Refactoring
                 VariableDeclaration(FieldType(FullTypeName), VariableName(StaticFieldIdentifierName(nameHints))));
         }
 
+        /// <summary>
+        /// Serializes the event argument creation details into diagnostic properties.
+        /// </summary>
+        /// <returns>The immutable diagnostic property dictionary.</returns>
         public ImmutableDictionary<string, string> ToDiagnosticProperties()
         {
             var dict = ImmutableDictionary.CreateBuilder<string, string>();
@@ -168,6 +210,11 @@ namespace CodeCracker.CSharp.Refactoring
             return dict.ToImmutable();
         }
 
+        /// <summary>
+        /// Restores event argument creation details from diagnostic properties.
+        /// </summary>
+        /// <param name="properties">The diagnostic property dictionary previously produced by this data object.</param>
+        /// <returns>The data object reconstructed from the property dictionary.</returns>
         public static PropertyChangedEventArgsAnalyzerData FromDiagnosticProperties(ImmutableDictionary<string, string> properties)
         {
             return new PropertyChangedEventArgsAnalyzerData(

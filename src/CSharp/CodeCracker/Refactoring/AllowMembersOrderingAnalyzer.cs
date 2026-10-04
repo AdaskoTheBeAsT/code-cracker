@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports type declarations whose members can be reordered.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class AllowMembersOrderingAnalyzer : DiagnosticAnalyzer
     {
@@ -22,8 +25,10 @@ namespace CodeCracker.CSharp.Refactoring
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.AllowMembersOrdering));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration);
 

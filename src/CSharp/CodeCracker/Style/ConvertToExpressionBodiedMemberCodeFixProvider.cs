@@ -12,14 +12,20 @@ using Microsoft.CodeAnalysis.Formatting;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to convert eligible members to expression-bodied syntax.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ConvertToExpressionBodiedMemberCodeFixProvider)), Shared]
     public class ConvertToExpressionBodiedMemberCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.ConvertToExpressionBodiedMember.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -64,6 +70,14 @@ namespace CodeCracker.CSharp.Style
             return await ReplaceNodeAsync(document, declaration, newDeclaration, cancellationToken);
         }
 
+        /// <summary>
+        /// Replaces a syntax node in a document's root.
+        /// </summary>
+        /// <param name="document">The document containing the target syntax.</param>
+        /// <param name="old">The node to replace.</param>
+        /// <param name="new">The replacement node.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task returning the document with the replacement node.</returns>
         public static async Task<Document> ReplaceNodeAsync(Document document, SyntaxNode @old, SyntaxNode @new, CancellationToken cancellationToken)
         {
             var root = await document.GetSyntaxRootAsync(cancellationToken);

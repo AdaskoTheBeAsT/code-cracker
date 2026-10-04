@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CodeCracker.CSharp.Design;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
@@ -632,6 +633,111 @@ public static void Execute(System.Action action)
                     }
                 }";
             await VerifyCSharpHasNoDiagnosticsAsync(test);
+        }
+
+        [Theory]
+        [InlineData("if (action is not null) action();")]
+        [InlineData("if (action is not null) { action(); }")]
+        [InlineData("if (action is not null) { if (System.DateTime.Now.Second > 0) action(); }")]
+        [InlineData("if (action is null) return; action();")]
+        [InlineData("if (action is null) { return; } action();")]
+        [InlineData("if (action is null) throw new System.ArgumentNullException(); action();")]
+        [InlineData("if (action is null) { throw new System.ArgumentNullException(); } action();")]
+        [InlineData("var result = action is not null ? action() : false;")]
+        [InlineData("var result = action is not null && action();")]
+        [InlineData("var result = action is null || action();")]
+        public async Task IgnoreIfGuardedByNullPattern(string statement)
+        {
+            var test = $@"
+public class MyClass
+{{
+    public void Execute(System.Func<bool> action)
+    {{
+        {statement}
+    }}
+}}";
+
+            await VerifyCSharpHasNoDiagnosticsAsync(test, LanguageVersion.CSharp9);
+        }
+
+        [Theory]
+        [InlineData("public event System.Action action;")]
+        [InlineData("public System.Action action;")]
+        [InlineData("public System.Action action { get; set; }")]
+        public async Task IgnoreMemberIfGuardedByNotNullPattern(string declaration)
+        {
+            var test = $@"
+public class MyClass
+{{
+    {declaration}
+
+    public void Execute()
+    {{
+        if (action is not null)
+            action();
+    }}
+}}";
+
+            await VerifyCSharpHasNoDiagnosticsAsync(test, LanguageVersion.CSharp9);
+        }
+
+        [Theory]
+        [InlineData("return;")]
+        [InlineData("{ return; }")]
+        [InlineData("throw new System.ArgumentNullException();")]
+        [InlineData("{ throw new System.ArgumentNullException(); }")]
+        public async Task IgnoreIfGuardedByNullPatternInConstructor(string guard)
+        {
+            var test = $@"
+public class MyClass
+{{
+    public MyClass(System.Action action)
+    {{
+        if (action is null) {guard}
+        action();
+    }}
+}}";
+
+            await VerifyCSharpHasNoDiagnosticsAsync(test, LanguageVersion.CSharp9);
+        }
+
+        [Theory]
+        [InlineData("if (other is not null) action();")]
+        [InlineData("if (action is null) action();")]
+        [InlineData("if (action is not null) { } else action();")]
+        [InlineData("if (action != null) { } else action();")]
+        [InlineData("if (action is null) System.Console.WriteLine(); action();")]
+        [InlineData("if (action is null) { System.Console.WriteLine(); } action();")]
+        [InlineData("action(); if (action is null) return;")]
+        [InlineData("if (other is null) return; action();")]
+        [InlineData("if (action is not null) return; action();")]
+        [InlineData("if (action is null) { action(); return; }")]
+        [InlineData("if (action == null) { action(); return; }")]
+        [InlineData("if (action is null) { if (other is null) return; } action();")]
+        [InlineData("var result = action is null ? action() : false;")]
+        [InlineData("var result = action is not null ? false : action();")]
+        [InlineData("var result = action != null ? false : action();")]
+        [InlineData("var result = other is not null ? action() : false;")]
+        [InlineData("var result = action is null && action();")]
+        [InlineData("var result = action is not null || action();")]
+        [InlineData("var result = other is not null && action();")]
+        [InlineData("var result = other is null || action();")]
+        [InlineData("if (action is not null or null) action();")]
+        public async Task WarningIfNullCheckDoesNotGuardInvocation(string statement)
+        {
+            var test = $@"
+public class MyClass
+{{
+    public void Execute(System.Func<bool> action, System.Func<bool> other)
+    {{
+        {statement}
+    }}
+}}";
+            var expected = new DiagnosticResult(DiagnosticId.UseInvokeMethodToFireEvent.ToDiagnosticId(), DiagnosticSeverity.Warning)
+                .WithLocation(6, 9 + statement.IndexOf("action()", System.StringComparison.Ordinal))
+                .WithMessage(string.Format(UseInvokeMethodToFireEventAnalyzer.MessageFormat, "action"));
+
+            await VerifyCSharpDiagnosticAsync(test, expected, LanguageVersion.CSharp9);
         }
 
         [Fact]

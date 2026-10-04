@@ -12,13 +12,18 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 
 namespace CodeCracker.CSharp.Maintainability
 {
+    /// <summary>
+    /// Provides fixes to add missing XML parameter entries for method parameters.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(XmlDocumentationCodeFixProvider)), Shared]
     public sealed class XmlDocumentationMissingInXmlCodeFixProvider : XmlDocumentationCodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.XmlDocumentation_MissingInXml.ToDiagnosticId());
 
         private const string WHITESPACE = @" ";
 
+        /// <inheritdoc/>
         public override SyntaxNode FixParameters(MethodDeclarationSyntax method, SyntaxNode root)
         {
             var documentationNode = method.GetLeadingTrivia().Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().First();
@@ -83,6 +88,7 @@ namespace CodeCracker.CSharp.Maintainability
             return SyntaxFactory.SingletonList<XmlAttributeSyntax>(xmlNameAttributeSyntax);
         }
 
+        /// <inheritdoc/>
         public override sealed Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

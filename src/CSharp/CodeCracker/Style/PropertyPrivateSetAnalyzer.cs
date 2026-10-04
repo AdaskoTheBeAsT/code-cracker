@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports auto-property setters whose accessibility can be restricted.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class PropertyPrivateSetAnalyzer : DiagnosticAnalyzer
     {
@@ -24,8 +27,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.PropertyPrivateSet));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeClass, SyntaxKind.PropertyDeclaration);
 
         private static void AnalyzeClass(SyntaxNodeAnalysisContext context)

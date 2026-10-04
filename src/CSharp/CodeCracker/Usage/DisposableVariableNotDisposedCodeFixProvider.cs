@@ -15,16 +15,25 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to ensure disposal of created disposable objects.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposableVariableNotDisposedCodeFixProvider)), Shared]
     public class DisposableVariableNotDisposedCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.DisposableVariableNotDisposed.ToDiagnosticId());
 
+        /// <summary>
+        /// The disposal code action title format, whose first placeholder receives the object name.
+        /// </summary>
         public readonly static string MessageFormat = "Dispose object: '{0}'";
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => DisposableVariableNotDisposedFixAllProvider.Instance;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -45,6 +54,13 @@ namespace CodeCracker.CSharp.Usage
             return newDocument;
         }
 
+        /// <summary>
+        /// Rewrites a disposable object creation's surrounding code to ensure disposal, using a using statement or an explicit Dispose call.
+        /// </summary>
+        /// <param name="root">The syntax root containing the target declaration or expression.</param>
+        /// <param name="objectCreation">The creation expression for the disposable object.</param>
+        /// <param name="semanticModel">The semantic model used to resolve symbols for the supplied syntax.</param>
+        /// <returns>The syntax root with the disposal transformation applied.</returns>
         public static SyntaxNode CreateUsing(SyntaxNode root, ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel)
         {
             SyntaxNode newRoot;

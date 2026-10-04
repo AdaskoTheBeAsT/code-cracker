@@ -13,14 +13,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to replace eligible string.Format calls with interpolated strings.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StringFormatCodeFixProvider)), Shared]
     public class StringFormatCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.StringFormat.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => StringFormatFixAllProvider.Instance;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -38,6 +44,12 @@ namespace CodeCracker.CSharp.Style
             return newDocument;
         }
 
+        /// <summary>
+        /// Replaces a composite-format invocation in a syntax root with an interpolated string.
+        /// </summary>
+        /// <param name="root">The syntax root containing the target declaration or expression.</param>
+        /// <param name="invocationExpression">The composite-format invocation with a literal format string and individually supplied arguments.</param>
+        /// <returns>The syntax root with the invocation replaced.</returns>
         public static SyntaxNode CreateNewStringInterpolation(SyntaxNode root, InvocationExpressionSyntax invocationExpression)
         {
             var newStringInterpolation = CreateNewStringInterpolation(invocationExpression);
@@ -45,6 +57,11 @@ namespace CodeCracker.CSharp.Style
             return newRoot;
         }
 
+        /// <summary>
+        /// Builds an interpolated string from a composite-format invocation with a literal format and individually supplied arguments.
+        /// </summary>
+        /// <param name="invocationExpression">The composite-format invocation with a literal format string and individually supplied arguments.</param>
+        /// <returns>The interpolated string expression.</returns>
         public static InterpolatedStringExpressionSyntax CreateNewStringInterpolation(InvocationExpressionSyntax invocationExpression)
         {
             var argumentList = invocationExpression.ArgumentList;

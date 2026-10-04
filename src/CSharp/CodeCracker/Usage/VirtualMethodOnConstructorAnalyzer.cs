@@ -7,6 +7,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports virtual method calls from constructors.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class VirtualMethodOnConstructorAnalyzer : DiagnosticAnalyzer
     {
@@ -28,8 +31,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.VirtualMethodOnConstructor));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.ConstructorDeclaration);

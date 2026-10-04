@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports constant expressions that can be replaced with their computed values.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ComputeExpressionAnalyzer : DiagnosticAnalyzer
     {
@@ -25,8 +28,10 @@ namespace CodeCracker.CSharp.Refactoring
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ComputeExpression));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.AddExpression, SyntaxKind.SubtractExpression, SyntaxKind.MultiplyExpression, SyntaxKind.DivideExpression);
 

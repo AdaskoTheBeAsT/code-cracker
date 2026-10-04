@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports argument exception parameter names that do not match declared parameters.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ArgumentExceptionAnalyzer : DiagnosticAnalyzer
     {
@@ -27,8 +30,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ArgumentException));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.ObjectCreationExpression);
 

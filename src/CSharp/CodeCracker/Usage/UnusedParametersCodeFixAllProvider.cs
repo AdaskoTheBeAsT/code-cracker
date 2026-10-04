@@ -8,12 +8,19 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Applies fixes across a document, project, or solution to remove unused parameters and their corresponding call-site arguments.
+    /// </summary>
     public sealed class UnusedParametersCodeFixAllProvider : FixAllProvider
     {
         private UnusedParametersCodeFixAllProvider() { }
 
         private const string message = "Remove unused parameter";
+        /// <summary>
+        /// The shared provider used to apply this code fix across a document, project, or solution.
+        /// </summary>
         public static readonly UnusedParametersCodeFixAllProvider Instance = new UnusedParametersCodeFixAllProvider();
+        /// <inheritdoc/>
         public override Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
         {
             switch (fixAllContext.Scope)

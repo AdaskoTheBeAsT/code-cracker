@@ -9,6 +9,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports constructor parameters that can be stored in fields.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class IntroduceFieldFromConstructorAnalyzer : DiagnosticAnalyzer
     {
@@ -27,8 +30,10 @@ namespace CodeCracker.CSharp.Refactoring
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.IntroduceFieldFromConstructor));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeConstructor, SyntaxKind.ConstructorDeclaration);
 
         private static void AnalyzeConstructor(SyntaxNodeAnalysisContext context)

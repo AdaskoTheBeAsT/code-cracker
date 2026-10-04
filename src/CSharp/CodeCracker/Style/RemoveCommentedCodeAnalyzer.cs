@@ -8,6 +8,9 @@ using System.Text;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports comments containing disabled code.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class RemoveCommentedCodeAnalyzer : DiagnosticAnalyzer
     {
@@ -23,8 +26,10 @@ namespace CodeCracker.CSharp.Style
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.RemoveCommentedCode));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxTreeAction(AnalyzeSingleLineCommentTrivia);
 

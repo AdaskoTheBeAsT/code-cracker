@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports nonprivate fields that can be made readonly.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class NoPrivateReadonlyFieldAnalyzer : DiagnosticAnalyzer
     {
@@ -27,8 +30,10 @@ namespace CodeCracker.CSharp.Usage
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.NoPrivateReadonlyField),
             customTags: new[] { WellKnownDiagnosticTags.CompilationEnd });
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext analysisContext)
         {
             analysisContext.RegisterCompilationStartAction(compilationStartContext =>

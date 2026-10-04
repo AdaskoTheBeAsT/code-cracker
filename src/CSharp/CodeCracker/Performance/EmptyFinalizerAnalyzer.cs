@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Performance
 {
+    /// <summary>
+    /// Reports empty finalizers.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class EmptyFinalizerAnalyzer : DiagnosticAnalyzer
     {
@@ -28,8 +31,10 @@ namespace CodeCracker.CSharp.Performance
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.EmptyFinalizer));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.DestructorDeclaration);
 

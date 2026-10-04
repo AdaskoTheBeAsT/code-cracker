@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports null checks that can use conditional access.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ExistenceOperatorAnalyzer : DiagnosticAnalyzer
     {
@@ -23,8 +26,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ExistenceOperator));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(LanguageVersion.CSharp6, Analyzer, SyntaxKind.IfStatement);
 
         private static void Analyzer(SyntaxNodeAnalysisContext context)

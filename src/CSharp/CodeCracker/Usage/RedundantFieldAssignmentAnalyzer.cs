@@ -7,6 +7,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports field initializers that explicitly assign the type's default value.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class RedundantFieldAssignmentAnalyzer : DiagnosticAnalyzer
     {
@@ -26,8 +29,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.RedundantFieldAssignment));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeFieldDeclaration, SyntaxKind.FieldDeclaration);
 
         private static void AnalyzeFieldDeclaration(SyntaxNodeAnalysisContext context)

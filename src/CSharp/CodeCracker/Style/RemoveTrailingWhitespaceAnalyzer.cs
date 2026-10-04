@@ -8,6 +8,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports trailing whitespace.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class RemoveTrailingWhitespaceAnalyzer : DiagnosticAnalyzer
     {
@@ -26,8 +29,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.RemoveTrailingWhitespace));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxTreeAction(AnalyzeTrailingTrivia);
 
         private static void AnalyzeTrailingTrivia(SyntaxTreeAnalysisContext context)

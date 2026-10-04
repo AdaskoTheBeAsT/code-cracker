@@ -7,6 +7,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports forwarding lambda expressions that can be replaced with method groups.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ConvertLambdaExpressionToMethodGroupAnalyzer : DiagnosticAnalyzer
     {
@@ -25,8 +28,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ConvertLambdaExpressionToMethodGroup));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.SimpleLambdaExpression, SyntaxKind.ParenthesizedLambdaExpression);
 
@@ -120,6 +125,11 @@ namespace CodeCracker.CSharp.Style
             return parentNodeToSpeculate ?? expression;
         }
 
+        /// <summary>
+        /// Checks whether a node kind is supported as a root for speculative semantic binding.
+        /// </summary>
+        /// <param name="node">The candidate root for speculative semantic binding.</param>
+        /// <returns>True if the node is a supported speculative root; otherwise, false.</returns>
         public static bool CanSpeculateOnNode(SyntaxNode node)
         {
             return (node is StatementSyntax && !node.IsKind(SyntaxKind.Block)) ||

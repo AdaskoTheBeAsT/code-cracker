@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports member assignments that can be incorporated into object initializers.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ObjectInitializerAnalyzer : DiagnosticAnalyzer
     {
@@ -38,9 +41,11 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ObjectInitializer_LocalDeclaration));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(RuleLocalDeclaration, RuleAssignment);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.RegisterSyntaxNodeAction(AnalyzeLocalDeclaration, SyntaxKind.LocalDeclarationStatement);
@@ -158,6 +163,13 @@ namespace CodeCracker.CSharp.Style
             context.ReportDiagnostic(diagnostic);
         }
 
+        /// <summary>
+        /// Checks whether any candidate assignment's right-hand side references the declared object variable.
+        /// </summary>
+        /// <param name="semanticModel">The semantic model used to resolve symbols for the supplied syntax.</param>
+        /// <param name="variableSymbol">The symbol of the object variable whose member assignments are inspected.</param>
+        /// <param name="assignmentExpressionStatements">The candidate assignment statements to check for references to the variable.</param>
+        /// <returns>True if a right-hand-side reference to the variable is found; otherwise, false.</returns>
         public static bool HasAssignmentUsingDeclaredVariable(SemanticModel semanticModel, ISymbol variableSymbol,
             IEnumerable<ExpressionStatementSyntax> assignmentExpressionStatements)
         {
@@ -176,6 +188,13 @@ namespace CodeCracker.CSharp.Style
             return false;
         }
 
+        /// <summary>
+        /// Collects consecutive simple member assignments to the object variable after the supplied statement.
+        /// </summary>
+        /// <param name="semanticModel">The semantic model used to resolve symbols for the supplied syntax.</param>
+        /// <param name="statement">The statement after which to collect consecutive member assignments.</param>
+        /// <param name="variableSymbol">The symbol of the object variable whose member assignments are inspected.</param>
+        /// <returns>The matching assignment statements, stopping at the first incompatible statement.</returns>
         public static List<ExpressionStatementSyntax> FindAssignmentExpressions(SemanticModel semanticModel,
             StatementSyntax statement, ISymbol variableSymbol)
         {

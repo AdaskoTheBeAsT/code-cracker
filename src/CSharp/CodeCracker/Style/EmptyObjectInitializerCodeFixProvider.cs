@@ -11,14 +11,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to remove empty object initializers.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(EmptyObjectInitializerCodeFixProvider)), Shared]
     public class EmptyObjectInitializerCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.EmptyObjectInitializer.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -26,6 +32,13 @@ namespace CodeCracker.CSharp.Style
             return Task.FromResult(0);
         }
 
+        /// <summary>
+        /// Removes the empty object initializer identified by the diagnostic.
+        /// </summary>
+        /// <param name="document">The document containing the target syntax.</param>
+        /// <param name="diagnostic">The diagnostic identifying the target declaration or expression.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task returning the document without the empty initializer.</returns>
         public static async Task<Document> RemoveAsync(Document document, Diagnostic diagnostic, CancellationToken cancellationToken)
         {
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);

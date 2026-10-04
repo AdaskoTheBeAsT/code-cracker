@@ -13,14 +13,20 @@ using Microsoft.CodeAnalysis.Simplification;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to add GC.SuppressFinalize calls to Dispose methods.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposablesShouldCallSuppressFinalizeCodeFixProvider)), Shared]
     public class DisposablesShouldCallSuppressFinalizeCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.DisposablesShouldCallSuppressFinalize.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

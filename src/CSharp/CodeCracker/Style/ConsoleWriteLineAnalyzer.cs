@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports formatted Console.WriteLine calls that can use string interpolation.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ConsoleWriteLineAnalyzer : DiagnosticAnalyzer
     {
@@ -24,8 +27,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ConsoleWriteLine));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeWriteLineInvocation, SyntaxKind.InvocationExpression);
 
         private static void AnalyzeWriteLineInvocation(SyntaxNodeAnalysisContext context) =>

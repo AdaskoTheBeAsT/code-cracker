@@ -11,15 +11,24 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to remove unreachable code reported by the compiler.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RemoveUnreachableCodeCodeFixProvider)), Shared]
     public class RemoveUnreachableCodeCodeFixProvider : CodeFixProvider
     {
+        /// <summary>
+        /// The code action title for removing compiler-reported unreachable code.
+        /// </summary>
         public const string Message = "Remove unreacheable code";
 
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("CS0162");
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => RemoveUnreachableCodeFixAllProvider.Instance;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -35,6 +44,12 @@ namespace CodeCracker.CSharp.Usage
             return newDoc;
         }
 
+        /// <summary>
+        /// Removes the unreachable statement or enclosing syntax, retaining an empty block where a statement is required.
+        /// </summary>
+        /// <param name="root">The syntax root containing the target declaration or expression.</param>
+        /// <param name="node">The compiler-reported unreachable node within the root.</param>
+        /// <returns>The syntax root with the unreachable code removed.</returns>
         public static SyntaxNode RemoveUnreachableStatement(SyntaxNode root, SyntaxNode node)
         {
             if (node.Parent.IsKind(SyntaxKind.IfStatement, SyntaxKind.WhileStatement))

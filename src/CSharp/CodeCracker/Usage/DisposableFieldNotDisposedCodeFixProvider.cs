@@ -13,14 +13,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to dispose eligible disposable fields.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposableFieldNotDisposedCodeFixProvider)), Shared]
     public class DisposableFieldNotDisposedCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.DisposableFieldNotDisposed_Created.ToDiagnosticId(), DiagnosticId.DisposableFieldNotDisposed_Returned.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

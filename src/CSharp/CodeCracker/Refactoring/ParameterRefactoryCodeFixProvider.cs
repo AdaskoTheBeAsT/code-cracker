@@ -13,14 +13,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Provides fixes to group method parameters into a new class.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ParameterRefactoryCodeFixProvider)), Shared]
     public class ParameterRefactoryCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.ParameterRefactory.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports if chains that can be replaced with switch statements.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ConvertToSwitchAnalyzer : DiagnosticAnalyzer
     {
@@ -27,8 +30,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ConvertToSwitch));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.IfStatement);
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)

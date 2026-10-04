@@ -8,6 +8,9 @@ using CodeCracker.Properties;
 
 namespace CodeCracker.CSharp.Maintainability
 {
+    /// <summary>
+    /// Reports mismatches between method parameters and XML parameter documentation.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class XmlDocumentationAnalyzer : DiagnosticAnalyzer
     {
@@ -31,8 +34,10 @@ namespace CodeCracker.CSharp.Maintainability
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.XmlDocumentation_MissingInXml));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(RuleMissingInCSharp, RuleMissingInXml);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.SingleLineDocumentationCommentTrivia);
 
         private static void Analyzer(SyntaxNodeAnalysisContext context)

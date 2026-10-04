@@ -12,14 +12,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Performance
 {
+    /// <summary>
+    /// Provides fixes to seal eligible attribute classes.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SealedAttributeCodeFixProvider)), Shared]
     public class SealedAttributeCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.SealedAttribute.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

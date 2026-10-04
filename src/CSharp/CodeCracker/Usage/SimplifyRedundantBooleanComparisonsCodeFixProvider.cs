@@ -12,14 +12,20 @@ using Microsoft.CodeAnalysis.Formatting;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to simplify redundant comparisons with boolean constants.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SimplifyRedundantBooleanComparisonsCodeFixProvider)), Shared]
     public class SimplifyRedundantBooleanComparisonsCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.SimplifyRedundantBooleanComparisons.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

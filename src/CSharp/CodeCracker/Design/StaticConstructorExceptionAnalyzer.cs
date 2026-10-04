@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Reports throw statements inside static constructors.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class StaticConstructorExceptionAnalyzer : DiagnosticAnalyzer
     {
@@ -26,8 +29,10 @@ namespace CodeCracker.CSharp.Design
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.StaticConstructorException));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.ConstructorDeclaration);
 

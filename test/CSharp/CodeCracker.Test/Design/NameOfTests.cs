@@ -672,13 +672,15 @@ public class TypeName
         public async Task WhenUsingProgramElementNameStringInMethodInvocationThenFixUpdatesAsExpected(string stringLiteral)
         {
             const string source = @"
+using System;
+
 namespace N1.N2
 {
     namespace N3
     {
         public class TypeName
         {
-            private readonly int readonlyField;
+            private readonly int readonlyField = 0;
             public int Property { get; set; }
             public event EventHandler ParticularEvent;
             public delegate int SomeDelegate(int c, double d);

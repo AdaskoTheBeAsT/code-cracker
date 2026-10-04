@@ -14,14 +14,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to move eligible member assignments into object initializers.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ObjectInitializerCodeFixProvider)), Shared]
     public class ObjectInitializerCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.ObjectInitializer_Assignment.ToDiagnosticId(), DiagnosticId.ObjectInitializer_LocalDeclaration.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -112,6 +118,7 @@ namespace CodeCracker.CSharp.Style
 
                     var initializers = SyntaxFactory.SeparatedList<ExpressionSyntax>(initializationExpressions, initializerSeparators);
 
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
                     var newObjectCreationExpression = objectCreationExpression.WithInitializer(
                         SyntaxFactory.InitializerExpression(
                             SyntaxKind.ObjectInitializerExpression,
@@ -122,6 +129,7 @@ namespace CodeCracker.CSharp.Style
                         .WithLeadingTrivia(objectCreationExpression.GetLeadingTrivia())
                         .WithTrailingTrivia(objectCreationExpression.GetTrailingTrivia())
                         .WithAdditionalAnnotations(Formatter.Annotation);
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
                     if (newObjectCreationExpression.ArgumentList?.Arguments.Count == 0)
                     {
                         newObjectCreationExpression = newObjectCreationExpression.WithArgumentList(null);

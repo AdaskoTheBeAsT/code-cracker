@@ -10,6 +10,9 @@ using System.Threading;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports redundant ToString calls in string concatenations.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UnnecessaryToStringInStringConcatenationAnalyzer : DiagnosticAnalyzer
     {
@@ -30,8 +33,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.UnnecessaryToStringInStringConcatenation));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.AddExpression);
 

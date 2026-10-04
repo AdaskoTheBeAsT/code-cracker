@@ -9,6 +9,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports string.Format calls that can use string interpolation.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class StringFormatAnalyzer : DiagnosticAnalyzer
     {
@@ -27,13 +30,23 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.StringFormat));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeFormatInvocation, SyntaxKind.InvocationExpression);
 
         private static void AnalyzeFormatInvocation(SyntaxNodeAnalysisContext context) =>
             AnalyzeFormatInvocation(context, "Format", "string.Format(string, ", "string.Format(string, params object[])", Rule);
 
+        /// <summary>
+        /// Reports eligible composite-format invocations that can be replaced with string interpolation.
+        /// </summary>
+        /// <param name="context">The analysis context for the target syntax or symbol.</param>
+        /// <param name="methodName">The simple name of the target formatting method.</param>
+        /// <param name="methodOverloadSignature">The symbol display-string prefix used to recognize target method overloads.</param>
+        /// <param name="methodWithArraySignature">The symbol display string identifying the array-argument overload.</param>
+        /// <param name="rule">The diagnostic descriptor reported when interpolation is applicable.</param>
         public static void AnalyzeFormatInvocation(SyntaxNodeAnalysisContext context, string methodName, string methodOverloadSignature, string methodWithArraySignature, DiagnosticDescriptor rule)
         {
             if (context.IsGenerated()) return;

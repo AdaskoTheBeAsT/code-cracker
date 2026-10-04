@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports fields of complex types that should be readonly.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ReadOnlyComplexTypesAnalyzer : DiagnosticAnalyzer
     {
@@ -25,8 +28,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ReadOnlyComplexTypes));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeNode,
                                                                       new[] { SyntaxKind.FieldDeclaration });
 

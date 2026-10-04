@@ -68,7 +68,7 @@ namespace CodeCracker.Test.CSharp.Refactoring
         public async Task FieldInitializerIsPreserved()
         {
             var test = @"
-            readonly string value, value2 = ""InitValue"";
+            readonly string value = ""InitValue"", value2 = ""InitValue"";
 
             TypeName(string value)
             {
@@ -128,7 +128,7 @@ namespace CodeCracker.Test.CSharp.Refactoring
                 this.Value2 = value;
             }
 
-            public string Value { get; } = ""InitValue"";
+            public string Value { get; }
             public string Value2 { get; } = ""InitValue"";
             ".WrapInCSharpClass();
             await VerifyCSharpFixAsync(test, fixtest);
@@ -167,8 +167,8 @@ namespace CodeCracker.Test.CSharp.Refactoring
                 this.Value2 = value;
             }
 
-            public string Value { get; } = ""InitValue"";
-            public string Value2 { get; } = ""InitValue"";
+            public string Value { get; }
+            public string Value2 { get; }
             ".WrapInCSharpClass();
             await VerifyCSharpFixAsync(test, fixtest);
         }
@@ -252,9 +252,37 @@ namespace CodeCracker.Test.CSharp.Refactoring
             var fixtest = @"
             readonly int a = 0, y = 1, z = 2;
 
-            public int X { get; } = 1;
+            public int X { get; }
             ".WrapInCSharpClass();
             await VerifyCSharpFixAsync(test, fixtest);
+        }
+
+        [Theory]
+        [InlineData("x, y = 1", "y = 1", "")]
+        [InlineData("y = 1, x", "y = 1", "")]
+        [InlineData("y = 1, x, z = 2", "y = 1, z = 2", "")]
+        [InlineData("x = 3, y = 1", "y = 1", " = 3;")]
+        [InlineData("y = 1, x = 3", "y = 1", " = 3;")]
+        [InlineData("y = 1, x = 3, z = 2", "y = 1, z = 2", " = 3;")]
+        [InlineData("x, y = CreateValue()", "y = CreateValue()", "")]
+        public async Task OnlyBackingFieldsOwnInitializerIsCopied(string fields, string remainingFields, string initializer)
+        {
+            var source = $@"
+public class MyClass
+{{
+    readonly int {fields};
+    public int X {{ get {{ return x; }} }}
+    private static int CreateValue() {{ return 1; }}
+}}";
+            var fix = $@"
+public class MyClass
+{{
+    readonly int {remainingFields};
+    public int X {{ get; }}{initializer}
+    private static int CreateValue() {{ return 1; }}
+}}";
+
+            await VerifyCSharpFixAsync(source, fix);
         }
 
         [Fact]

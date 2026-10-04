@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports interface names without an I prefix.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class InterfaceNameAnalyzer : DiagnosticAnalyzer
     {
@@ -24,8 +27,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.InterfaceName));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeClass, SyntaxKind.InterfaceDeclaration);
 
         private static void AnalyzeClass(SyntaxNodeAnalysisContext context)

@@ -1,5 +1,6 @@
 ﻿using CodeCracker.CSharp.Style;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
 using System.Threading.Tasks;
 using Xunit;
@@ -50,6 +51,223 @@ namespace CodeCracker.Test.CSharp.Style
             await VerifyCSharpHasNoDiagnosticsAsync(test);
 
         }
+        [Theory]
+        [InlineData("ref var")]
+        [InlineData("ref readonly var")]
+        [InlineData("scoped ref var")]
+        [InlineData("scoped ref readonly var")]
+        public async Task IgnoresImplicitlyTypedRefDeclarations(string type)
+        {
+            var test = @"
+class Reader
+{
+    void Read(ref int value)
+    {
+        " + type + @" entry = ref value;
+    }
+}";
+            await VerifyCSharpHasNoDiagnosticsAsync(test, LanguageVersion.Latest);
+        }
+
+        [Theory]
+        [InlineData("System.Collections.Generic.List<int> values = new();")]
+        [InlineData("System.Collections.Generic.List<int> values = (new());")]
+        [InlineData("System.Collections.Generic.List<int> values = true ? new() : new();")]
+        [InlineData("System.Collections.Generic.List<int> values = 0 switch { _ => new() };")]
+        [InlineData("int[] values = [];")]
+        [InlineData("int[] values = [1, 2, 3];")]
+        [InlineData("int[] values = true ? [] : [1];")]
+        [InlineData("int[] values = 0 switch { _ => [] };")]
+        [InlineData("int value = default;")]
+        [InlineData("int value = (default);")]
+        [InlineData("string value = null;")]
+        [InlineData("System.Collections.Generic.List<int> first = new System.Collections.Generic.List<int>(), second = new();")]
+        [InlineData("System.Linq.Expressions.Expression<System.Func<int>> value = () => 1;")]
+        [InlineData("System.Func<long> value = () => 1;")]
+        public async Task IgnoresInitializersThatRequireTheDeclaredType(string declaration)
+        {
+            var test = @"
+class Reader
+{
+    void Read()
+    {
+        " + declaration + @"
+    }
+}";
+            await VerifyCSharpHasNoDiagnosticsAsync(test, LanguageVersion.Latest);
+        }
+
+        [Theory]
+        [InlineData("(int Count, int Total) value = (First: 1, Second: 2);")]
+        [InlineData("(int Count, int Total) value = (1, 2);")]
+        [InlineData("System.Collections.Generic.List<(int Count, int Total)> values = new System.Collections.Generic.List<(int First, int Second)>();")]
+        [InlineData("string value = \"text\";")]
+        public async Task IgnoresDeclarationsWhoseInferredTypeChangesNamesOrNullability(string declaration)
+        {
+            var test = @"
+#nullable enable
+class Reader
+{
+    void Read()
+    {
+        " + declaration + @"
+    }
+}";
+            await VerifyCSharpHasNoDiagnosticsAsync(test, LanguageVersion.Latest);
+        }
+
+        [Theory]
+        [InlineData("MissingType value = Missing();")]
+        [InlineData("ref MissingType value = ref Missing();")]
+        [InlineData("ref readonly MissingType value = ref Missing();")]
+        [InlineData("dynamic value = Missing();")]
+        [InlineData("int value = ;")]
+        [InlineData("ref readonly var value = ref ;")]
+        public async Task IgnoresIncompleteOrUnresolvedDeclarations(string declaration)
+        {
+            var test = @"
+class Reader
+{
+    void Read()
+    {
+        " + declaration + @"
+    }
+}";
+            await VerifyCSharpHasNoDiagnosticsAsync(test, LanguageVersion.Latest);
+        }
+
+        [Theory]
+        [InlineData("ref int", "ref var")]
+        [InlineData("ref readonly int", "ref readonly var")]
+        [InlineData("scoped ref int", "scoped ref var")]
+        [InlineData("scoped ref readonly int", "scoped ref readonly var")]
+        [InlineData("ref readonly /* type */ int", "ref readonly /* type */ var")]
+        public async Task FixPreservesRefDeclarationModifiers(string type, string inferredType)
+        {
+            var test = @"
+class Reader
+{
+    void Read(ref int value)
+    {
+        " + type + @" entry = ref value;
+    }
+}";
+            var expected = test.Replace(type + " entry", inferredType + " entry");
+            await VerifyCSharpFixAsync(test, expected, languageVersionCSharp: LanguageVersion.Latest);
+        }
+
+        [Theory]
+        [InlineData("using")]
+        [InlineData("await using")]
+        public async Task FixPreservesUsingDeclarationModifiers(string modifiers)
+        {
+            var test = @"
+class Reader
+{
+    async System.Threading.Tasks.Task Read()
+    {
+        " + modifiers + @" System.IO.MemoryStream stream = new System.IO.MemoryStream();
+        await System.Threading.Tasks.Task.Yield();
+    }
+}";
+            var expected = test.Replace("System.IO.MemoryStream stream", "var stream");
+            await VerifyCSharpFixAsync(test, expected, languageVersionCSharp: LanguageVersion.Latest);
+        }
+
+        [Fact]
+        public async Task FixPreservesMultipleUsingDeclarations()
+        {
+            const string test = @"
+class Reader
+{
+    void Read()
+    {
+        using System.IO.MemoryStream first = new System.IO.MemoryStream(), second = new System.IO.MemoryStream();
+    }
+}";
+            const string expected = @"
+class Reader
+{
+    void Read()
+    {
+        using var first = new System.IO.MemoryStream();
+        using var second = new System.IO.MemoryStream();
+    }
+}";
+            await VerifyCSharpFixAsync(test, expected, languageVersionCSharp: LanguageVersion.Latest);
+        }
+
+        [Theory]
+        [InlineData("scoped System.Span<int> values = new System.Span<int>(new int[1]);",
+                    "scoped var values = new System.Span<int>(new int[1]);")]
+        [InlineData("(int Count, string Name) value = (Count: 1, Name: \"name\");",
+                    "var value = (Count: 1, Name: \"name\");")]
+        [InlineData("nint value = (nint)1;", "var value = (nint)1;")]
+        [InlineData("string value = \"\"\"text\"\"\";", "var value = \"\"\"text\"\"\";")]
+        [InlineData("System.Func<int> value = () => 1;", "var value = () => 1;")]
+        [InlineData("int value = 0 switch { _ => 1 };", "var value = 0 switch { _ => 1 };")]
+        public async Task FixSupportsNewerInferredTypes(string declaration, string inferredDeclaration)
+        {
+            var test = @"
+class Reader
+{
+    void Read()
+    {
+        " + declaration + @"
+    }
+}";
+            var expected = test.Replace(declaration, inferredDeclaration);
+            await VerifyCSharpFixAsync(test, expected, languageVersionCSharp: LanguageVersion.Latest);
+        }
+
+        [Fact]
+        public async Task CreatesDiagnosticForTopLevelDeclaration()
+        {
+            const string test = "int value = 1;";
+            var expected = new DiagnosticResult(DiagnosticId.AlwaysUseVarOnPrimitives.ToDiagnosticId(), DiagnosticSeverity.Warning)
+                .WithLocation(1, 1)
+                .WithMessage("Use 'var' instead of specifying the type name.");
+            await VerifyCSharpDiagnosticAsync(test, expected, LanguageVersion.Latest);
+        }
+
+        [Fact]
+        public async Task FixAllSupportsRefAndUsingDeclarations()
+        {
+            const string test = @"
+class Reader
+{
+    void Read(ref int value)
+    {
+        ref readonly int entry = ref value;
+        using System.IO.MemoryStream stream = new System.IO.MemoryStream();
+        scoped ref int mutableEntry = ref value;
+    }
+}";
+            var expected = test.Replace("readonly int entry", "readonly var entry")
+                .Replace("System.IO.MemoryStream stream", "var stream")
+                .Replace("ref int mutableEntry", "ref var mutableEntry");
+            await VerifyCSharpFixAllAsync(test, expected, languageVersionCSharp: LanguageVersion.Latest);
+        }
+
+        [Fact]
+        public async Task SupportsRefReturnsInFileScopedNamespace()
+        {
+            const string test = @"
+namespace Serialization;
+class Reader
+{
+    private int value;
+    private ref readonly int GetValueAt(int index) => ref value;
+
+    (int Value, int Index)? Read(int index)
+    {
+        ref readonly var entry = ref GetValueAt(index);
+        return (entry, index);
+    }
+}";
+            await VerifyCSharpHasNoDiagnosticsAsync(test, LanguageVersion.Latest);
+        }
+
 
         [Fact]
         public async Task IgnoresDeclarationsWithNoInitializers()

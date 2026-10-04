@@ -11,19 +11,32 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Provides a common code fix that orders type members using a derived provider's comparer.
+    /// </summary>
     public abstract class BaseAllowMembersOrderingCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.AllowMembersOrdering.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <summary>
+        /// The code action description format, whose first placeholder receives the type name.
+        /// </summary>
         protected readonly string codeActionDescription;
 
+        /// <summary>
+        /// Initializes a member-ordering provider with a code action description format.
+        /// </summary>
+        /// <param name="codeActionDescription">The code action description format, whose first placeholder receives the type name.</param>
         protected BaseAllowMembersOrderingCodeFixProvider(string codeActionDescription) : base()
         {
             this.codeActionDescription = codeActionDescription;
         }
 
+        /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
@@ -53,6 +66,12 @@ namespace CodeCracker.CSharp.Refactoring
             return newDocument;
         }
 
+        /// <summary>
+        /// Creates the comparer that defines the provider's member ordering.
+        /// </summary>
+        /// <param name="document">The document containing the target syntax.</param>
+        /// <param name="cancellationToken">The token available to cancel document analysis while creating the comparer.</param>
+        /// <returns>The comparer to use when sorting type members.</returns>
         protected abstract IComparer<MemberDeclarationSyntax> GetMemberDeclarationComparer(Document document, CancellationToken cancellationToken);
 
         private static bool TryReplaceTypeMembers(TypeDeclarationSyntax typeDeclarationSyntax, IEnumerable<MemberDeclarationSyntax> membersDeclaration, IEnumerable<MemberDeclarationSyntax> sortedMembers, out TypeDeclarationSyntax orderedType)

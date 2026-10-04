@@ -5,6 +5,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Performance
 {
+    /// <summary>
+    /// Reports nonabstract attribute classes that are not sealed.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class SealedAttributeAnalyzer : DiagnosticAnalyzer
     {
@@ -24,8 +27,10 @@ namespace CodeCracker.CSharp.Performance
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.SealedAttribute));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSymbolAction(Analyze, SymbolKind.NamedType);
 
         private static void Analyze(SymbolAnalysisContext context)
@@ -42,6 +47,11 @@ namespace CodeCracker.CSharp.Performance
             context.ReportDiagnostic(Diagnostic.Create(Rule, type.Locations[0], type.Name));
         }
 
+        /// <summary>
+        /// Checks whether a type has a base type named Attribute.
+        /// </summary>
+        /// <param name="symbol">The type symbol to inspect.</param>
+        /// <returns>True if an Attribute-named base type is found; otherwise, false.</returns>
         public static bool IsAttribute(ITypeSymbol symbol)
         {
             var @base = symbol.BaseType;

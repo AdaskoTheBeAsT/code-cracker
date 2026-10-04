@@ -8,6 +8,9 @@ using System.Collections.Generic;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports array-indexing for loops that can use foreach.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ForInArrayAnalyzer : DiagnosticAnalyzer
     {
@@ -24,8 +27,10 @@ namespace CodeCracker.CSharp.Style
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ForInArray));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.ForStatement);
 

@@ -6,6 +6,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports redundant comparisons with boolean constants.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class SimplifyRedundantBooleanComparisonsAnalyzer : DiagnosticAnalyzer
     {
@@ -23,8 +26,10 @@ namespace CodeCracker.CSharp.Usage
             customTags: WellKnownDiagnosticTags.Unnecessary,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.SimplifyRedundantBooleanComparisons));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.EqualsExpression, SyntaxKind.NotEqualsExpression);
 

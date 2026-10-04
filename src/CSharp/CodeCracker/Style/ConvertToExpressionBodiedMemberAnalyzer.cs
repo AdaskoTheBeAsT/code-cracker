@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports members that can use expression bodies.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ConvertToExpressionBodiedMemberAnalyzer : DiagnosticAnalyzer
     {
@@ -24,8 +27,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ConvertToExpressionBodiedMember));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.RegisterSyntaxNodeAction(LanguageVersion.CSharp6, AnalyzeBaseMethodNode, SyntaxKind.MethodDeclaration, SyntaxKind.OperatorDeclaration, SyntaxKind.ConversionOperatorDeclaration);

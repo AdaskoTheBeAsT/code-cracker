@@ -10,14 +10,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to remove redundant ToString calls from string concatenations.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UnnecessaryParenthesisCodeFixProvider)), Shared]
     public class UnnecessaryToStringInStringConcatenationCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.UnnecessaryToStringInStringConcatenation.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

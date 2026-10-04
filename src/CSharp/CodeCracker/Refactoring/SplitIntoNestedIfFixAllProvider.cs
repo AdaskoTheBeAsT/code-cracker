@@ -7,11 +7,18 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Applies fixes across a document, project, or solution to split combined conditions into nested if statements.
+    /// </summary>
     public sealed class SplitIntoNestedIfFixAllProvider : FixAllProvider
     {
         private static readonly SyntaxAnnotation nestedIfAnnotation = new SyntaxAnnotation(nameof(SplitIntoNestedIfFixAllProvider));
         private SplitIntoNestedIfFixAllProvider() { }
+        /// <summary>
+        /// The shared provider used to apply this code fix across a document, project, or solution.
+        /// </summary>
         public static readonly SplitIntoNestedIfFixAllProvider Instance = new SplitIntoNestedIfFixAllProvider();
+        /// <inheritdoc/>
         public override Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
         {
             switch (fixAllContext.Scope)

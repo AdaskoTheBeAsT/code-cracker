@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports properties backed by fields that can become auto-properties.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class SwitchToAutoPropAnalyzer : DiagnosticAnalyzer
     {
@@ -26,8 +29,10 @@ namespace CodeCracker.CSharp.Style
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.SwitchToAutoProp));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.RegisterSyntaxNodeActionForVersionLower(LanguageVersion.CSharp6, AnalyzePropertyWithoutFieldInitializer, SyntaxKind.PropertyDeclaration);

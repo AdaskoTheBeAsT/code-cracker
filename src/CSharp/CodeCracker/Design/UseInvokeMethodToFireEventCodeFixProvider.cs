@@ -13,16 +13,22 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Provides fixes to invoke delegates using conditional access or a copied reference.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseInvokeMethodToFireEventCodeFixProvider)), Shared]
     public class UseInvokeMethodToFireEventCodeFixProvider : CodeFixProvider
     {
         private const string SyntaxAnnotatinKind = "CC-CopyEvent";
 
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.UseInvokeMethodToFireEvent.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public async sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

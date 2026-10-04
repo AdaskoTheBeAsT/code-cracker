@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports exception rethrows that lose the original stack trace.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class RethrowExceptionAnalyzer : DiagnosticAnalyzer
     {
@@ -26,8 +29,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.RethrowException));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.ThrowStatement);
 

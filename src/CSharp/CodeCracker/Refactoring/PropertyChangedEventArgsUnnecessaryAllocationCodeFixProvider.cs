@@ -16,14 +16,22 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Provides fixes to replace repeated PropertyChangedEventArgs allocations with reusable static fields.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(PropertyChangedEventArgsUnnecessaryAllocationCodeFixProvider)), Shared]
     public sealed class PropertyChangedEventArgsUnnecessaryAllocationCodeFixProvider : CodeFixProvider
     {
+        /// <summary>
+        /// The localized title displayed for the event argument caching code action.
+        /// </summary>
         public LocalizableString CodeActionTitle = new LocalizableResourceString(nameof(Resources.PropertyChangedEventArgsUnnecessaryAllocation_CodeActionTitle), Resources.ResourceManager, typeof(Resources));
 
+        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds
             => ImmutableArray.Create(DiagnosticId.PropertyChangedEventArgsUnnecessaryAllocation.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

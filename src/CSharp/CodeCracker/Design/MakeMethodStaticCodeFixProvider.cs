@@ -15,13 +15,19 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Provides fixes to make eligible methods static.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MakeMethodStaticCodeFixProvider)), Shared]
     public class MakeMethodStaticCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.MakeMethodStatic.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

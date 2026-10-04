@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Performance
 {
+    /// <summary>
+    /// Reports local variables initialized with constant values that are never reassigned.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class MakeLocalVariableConstWhenItIsPossibleAnalyzer :
         DiagnosticAnalyzer
@@ -25,8 +28,10 @@ namespace CodeCracker.CSharp.Performance
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.MakeLocalVariableConstWhenItIsPossible));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.LocalDeclarationStatement);
 

@@ -35,32 +35,21 @@ namespace CodeCracker.Test
         }
 
         /// <summary>
-        /// Compare two collections of Diagnostics,and return a list of any new diagnostics that appear only in the second collection.
-        /// Note: Considers Diagnostics to be the same if they have the same Ids.  In teh case of mulitple diagnostics with the smae Id in a row,
-        /// this method may not necessarily return the new one.
+        /// Compare diagnostic counts by Id, ignoring changes in order and source location.
+        /// Return occurrences in the second collection that exceed the original count for that Id.
         /// </summary>
         /// <param name="diagnostics">The Diagnostics that existed in the code before the CodeFix was applied</param>
         /// <param name="newDiagnostics">The Diagnostics that exist in the code after the CodeFix was applied</param>
         /// <returns>A list of Diagnostics that only surfaced in the code after the CodeFix was applied</returns>
-        private static IEnumerable<Diagnostic> GetNewDiagnostics(IEnumerable<Diagnostic> diagnostics, IEnumerable<Diagnostic> newDiagnostics)
+        protected static IEnumerable<Diagnostic> GetNewDiagnostics(IEnumerable<Diagnostic> diagnostics, IEnumerable<Diagnostic> newDiagnostics)
         {
-            var oldArray = diagnostics.OrderBy(d => d.Location.SourceSpan.Start).ToArray();
-            var newArray = newDiagnostics.OrderBy(d => d.Location.SourceSpan.Start).ToArray();
-
-            var oldIndex = 0;
-            var newIndex = 0;
-
-            while (newIndex < newArray.Length)
+            var remainingCounts = diagnostics.GroupBy(d => d.Id).ToDictionary(group => group.Key, group => group.Count());
+            foreach (var diagnostic in newDiagnostics.OrderBy(d => d.Location.SourceSpan.Start))
             {
-                if (oldIndex < oldArray.Length && oldArray[oldIndex].Id == newArray[newIndex].Id)
-                {
-                    ++oldIndex;
-                    ++newIndex;
-                }
+                if (remainingCounts.TryGetValue(diagnostic.Id, out var count) && count > 0)
+                    remainingCounts[diagnostic.Id] = count - 1;
                 else
-                {
-                    yield return newArray[newIndex++];
-                }
+                    yield return diagnostic;
             }
         }
 

@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports unused method and constructor parameters.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UnusedParametersAnalyzer : DiagnosticAnalyzer
     {
@@ -27,8 +30,10 @@ namespace CodeCracker.CSharp.Usage
             customTags: WellKnownDiagnosticTags.Unnecessary,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.UnusedParameters));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.MethodDeclaration, SyntaxKind.ConstructorDeclaration);
 

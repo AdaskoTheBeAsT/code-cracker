@@ -7,10 +7,14 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeCracker.CSharp.Design.InconsistentAccessibility
 {
+    /// <summary>
+    /// Locates an indexer return type whose accessibility is inconsistent with the indexer.
+    /// </summary>
     public sealed class InconsistentAccessibilityInIndexerReturnType : InconsistentAccessibilityInfoProvider
     {
         private static readonly LocalizableString CodeActionMessage = new LocalizableResourceString(nameof(Resources.InconsistentAccessibilityInIndexerReturnType_Title), Resources.ResourceManager, typeof(Resources));
 
+        /// <inheritdoc/>
         public async Task<InconsistentAccessibilityInfo> GetInconsistentAccessibilityInfoAsync(Document document, Diagnostic diagnostic, CancellationToken cancellationToken)
         {
             var result = new InconsistentAccessibilityInfo();

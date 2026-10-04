@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Formatting;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
@@ -12,14 +13,20 @@ using System.Threading.Tasks;
 namespace CodeCracker.CSharp.Style
 {
 
+    /// <summary>
+    /// Provides fixes to replace eligible explicit variable types with var while preserving declaration modifiers.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AlwaysUseVarCodeFixProvider)), Shared]
     public class AlwaysUseVarCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.AlwaysUseVar.ToDiagnosticId(), DiagnosticId.AlwaysUseVarOnPrimitives.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -32,13 +39,34 @@ namespace CodeCracker.CSharp.Style
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 
             var diagnosticSpan = diagnostic.Location.SourceSpan;
-            var localDeclaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<LocalDeclarationStatementSyntax>().First();
+            var node = root.FindNode(diagnosticSpan, getInnermostNodeForTie: true);
+            var declarationExpression = node.FirstAncestorOrSelf<DeclarationExpressionSyntax>();
+            if (declarationExpression != null &&
+                !(declarationExpression.Parent is ArgumentSyntax argument && argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword)))
+            {
+                var assignment = declarationExpression.FirstAncestorOrSelf<AssignmentExpressionSyntax>();
+                var forEach = declarationExpression.FirstAncestorOrSelf<ForEachVariableStatementSyntax>();
+                var original = assignment?.Left ?? forEach?.Variable;
+                var replacement = AlwaysUseVarSemanticHelper.CreateInferredDeconstruction(original);
+                if (replacement == null) return document;
+                return document.WithSyntaxRoot(root.ReplaceNode(original,
+                    replacement.WithAdditionalAnnotations(Formatter.Annotation)));
+            }
+            var localDeclaration = node.FirstAncestorOrSelf<LocalDeclarationStatementSyntax>();
+            if (localDeclaration == null || !localDeclaration.Declaration.Type.Span.Contains(diagnosticSpan))
+            {
+                return document.WithSyntaxRoot(root.ReplaceNode(node,
+                    SyntaxFactory.IdentifierName("var").WithTriviaFrom(node).WithAdditionalAnnotations(Formatter.Annotation)));
+            }
             var variableDeclaration = localDeclaration.Declaration;
             var numVariables = variableDeclaration.Variables.Count;
 
             var newVariableDeclarations = new VariableDeclarationSyntax[numVariables];
 
-            var varSyntax = SyntaxFactory.IdentifierName("var");
+            var originalTypeSyntax = variableDeclaration.Type;
+            var typeToReplace = AlwaysUseVarAnalyzer.GetTypeToReplace(originalTypeSyntax);
+            var varSyntax = originalTypeSyntax.ReplaceNode(typeToReplace,
+                SyntaxFactory.IdentifierName("var"));
 
             //Create a new var declaration for each variable.
             for (var i = 0; i < numVariables; i++)
@@ -58,21 +86,30 @@ namespace CodeCracker.CSharp.Style
             }
 
             //ensure trivia for leading type node is preserved
-            var originalTypeSyntax = variableDeclaration.Type;
             newVariableDeclarations[0] = newVariableDeclarations[0]
-                .WithType((TypeSyntax) varSyntax.WithSameTriviaAs(originalTypeSyntax));
+                .WithType(originalTypeSyntax.ReplaceNode(typeToReplace,
+                    SyntaxFactory.IdentifierName("var").WithSameTriviaAs(typeToReplace)));
 
-            var newLocalDeclarationStatements = newVariableDeclarations.Select(SyntaxFactory.LocalDeclarationStatement).ToList();
+            var newLocalDeclarationStatements = newVariableDeclarations
+                .Select(declaration => SyntaxFactory.LocalDeclarationStatement(declaration)
+                    .WithAwaitKeyword(localDeclaration.AwaitKeyword)
+                    .WithUsingKeyword(localDeclaration.UsingKeyword)
+                    .WithModifiers(localDeclaration.Modifiers)
+                    .WithAttributeLists(localDeclaration.AttributeLists)).ToList();
 
 
             //Preserve the trivia for the entire statement at the start and at the end
             newLocalDeclarationStatements[0] =
-                newLocalDeclarationStatements[0].WithLeadingTrivia(variableDeclaration.GetLeadingTrivia());
+                newLocalDeclarationStatements[0].WithLeadingTrivia(localDeclaration.GetLeadingTrivia());
             var lastIndex = numVariables -1;
             newLocalDeclarationStatements[lastIndex] =
                 newLocalDeclarationStatements[lastIndex].WithTrailingTrivia(localDeclaration.GetTrailingTrivia());
 
-            var newRoot = root.ReplaceNode(localDeclaration, newLocalDeclarationStatements);
+            var newRoot = newLocalDeclarationStatements.Count == 1
+                ? root.ReplaceNode(localDeclaration, newLocalDeclarationStatements[0])
+                : localDeclaration.Parent is GlobalStatementSyntax globalStatement
+                    ? root.ReplaceNode(globalStatement, newLocalDeclarationStatements.Select(globalStatement.WithStatement))
+                    : root.ReplaceNode(localDeclaration, newLocalDeclarationStatements);
             var newDocument = document.WithSyntaxRoot(newRoot);
             return newDocument;
         }

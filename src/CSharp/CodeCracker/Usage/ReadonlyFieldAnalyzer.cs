@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports fields that can be made readonly.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ReadonlyFieldAnalyzer : DiagnosticAnalyzer
     {
@@ -26,8 +29,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ReadonlyField));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterCompilationStartAction(AnalyzeCompilation);
 
         private static void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartAnalysisContext)

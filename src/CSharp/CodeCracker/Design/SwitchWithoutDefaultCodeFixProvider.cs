@@ -13,13 +13,19 @@ using System.Threading;
 using System.Threading.Tasks;
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Provides fixes to add default sections to switch statements.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SwitchWithoutDefaultCodeFixProvider)), Shared]
     public class SwitchWithoutDefaultCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.SwitchCaseWithoutDefault.ToDiagnosticId());
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

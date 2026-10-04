@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Reports conditional assignments or returns that can use conditional expressions.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class TernaryOperatorAnalyzer : DiagnosticAnalyzer
     {
@@ -33,8 +36,10 @@ namespace CodeCracker.CSharp.Style
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.TernaryOperator_Assignment));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(RuleForIfWithReturn, RuleForIfWithAssignment);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.IfStatement);
 

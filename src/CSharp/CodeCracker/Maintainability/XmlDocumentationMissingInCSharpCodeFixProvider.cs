@@ -12,11 +12,16 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Maintainability
 {
+    /// <summary>
+    /// Provides fixes to remove XML parameter entries for parameters absent from the method.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(XmlDocumentationCodeFixProvider)), Shared]
     public sealed class XmlDocumentationMissingInCSharpCodeFixProvider : XmlDocumentationCodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.XmlDocumentation_MissingInCSharp.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public override SyntaxNode FixParameters(MethodDeclarationSyntax method, SyntaxNode root)
         {
             var documentationNode = method.GetLeadingTrivia().Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().First();
@@ -39,6 +44,7 @@ namespace CodeCracker.CSharp.Maintainability
             return allNodesToRemove;
         }
 
+        /// <inheritdoc/>
         public override sealed Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

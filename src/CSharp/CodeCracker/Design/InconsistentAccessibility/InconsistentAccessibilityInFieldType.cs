@@ -7,10 +7,14 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeCracker.CSharp.Design.InconsistentAccessibility
 {
+    /// <summary>
+    /// Locates a field type and the accessibility modifiers needed to match its field declaration.
+    /// </summary>
     public sealed class InconsistentAccessibilityInFieldType : InconsistentAccessibilityInfoProvider
     {
         private static readonly LocalizableString CodeActionMessage = new LocalizableResourceString(nameof(Resources.InconsistentAccessibilityInFieldType_Title), Resources.ResourceManager, typeof(Resources));
 
+        /// <inheritdoc/>
         public async Task<InconsistentAccessibilityInfo> GetInconsistentAccessibilityInfoAsync(Document document, Diagnostic diagnostic, CancellationToken cancellationToken)
         {
             var result = new InconsistentAccessibilityInfo();

@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Reports delegate invocations that should use a null check or a stable delegate reference.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UseInvokeMethodToFireEventAnalyzer : DiagnosticAnalyzer
     {
@@ -28,8 +31,10 @@ namespace CodeCracker.CSharp.Design
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.UseInvokeMethodToFireEvent));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.InvocationExpression);
 
@@ -69,17 +74,8 @@ namespace CodeCracker.CSharp.Design
                 var ifs = method.Body.Statements.OfKind(SyntaxKind.IfStatement);
                 foreach (IfStatementSyntax @if in ifs)
                 {
-                    if (!@if.Condition?.IsKind(SyntaxKind.EqualsExpression) ?? true) continue;
-                    var equals = (BinaryExpressionSyntax)@if.Condition;
-                    if (equals.Left == null || equals.Right == null) continue;
-                    if (@if.GetLocation().SourceSpan.Start > invocation.GetLocation().SourceSpan.Start) return false;
-                    ISymbol identifierSymbol;
-                    if (equals.Right.IsKind(SyntaxKind.NullLiteralExpression) && equals.Left.IsKind(SyntaxKind.IdentifierName))
-                        identifierSymbol = semanticModel.GetSymbolInfo(equals.Left).Symbol;
-                    else if (equals.Left.IsKind(SyntaxKind.NullLiteralExpression) && equals.Right.IsKind(SyntaxKind.IdentifierName))
-                        identifierSymbol = semanticModel.GetSymbolInfo(equals.Right).Symbol;
-                    else continue;
-                    if (!symbol.Equals(identifierSymbol)) continue;
+                    if (@if.Span.End > invocation.SpanStart) continue;
+                    if (!IsConditionThatChecksForEqualsNull(@if.Condition, semanticModel, symbol)) continue;
                     if (@if.Statement == null) continue;
                     if (@if.Statement.IsKind(SyntaxKind.Block))
                     {
@@ -95,8 +91,13 @@ namespace CodeCracker.CSharp.Design
             return false;
         }
 
-        private static bool IsPartOfATernaryThatChecksForNull(InvocationExpressionSyntax invocation, SemanticModel semanticModel, ISymbol symbol) =>
-            IsConditionThatChecksForNotEqualsNull(invocation.FirstAncestorOfType<ConditionalExpressionSyntax>()?.Condition, semanticModel, symbol);
+        private static bool IsPartOfATernaryThatChecksForNull(InvocationExpressionSyntax invocation, SemanticModel semanticModel, ISymbol symbol)
+        {
+            var conditional = invocation.FirstAncestorOfType<ConditionalExpressionSyntax>();
+            return conditional != null
+                && conditional.WhenTrue.Span.Contains(invocation.Span)
+                && IsConditionThatChecksForNotEqualsNull(conditional.Condition, semanticModel, symbol);
+        }
 
         private static bool IsPartOfALogicalOrThatChecksForNull(InvocationExpressionSyntax invocation, SemanticModel semanticModel, ISymbol symbol) =>
             IsConditionThatChecksForEqualsNull(invocation.FirstAncestorOfKind<BinaryExpressionSyntax>(SyntaxKind.LogicalOrExpression)?.Left, semanticModel, symbol);
@@ -105,7 +106,9 @@ namespace CodeCracker.CSharp.Design
             IsConditionThatChecksForNotEqualsNull(invocation.FirstAncestorOfKind<BinaryExpressionSyntax>(SyntaxKind.LogicalAndExpression)?.Left, semanticModel, symbol);
 
         private static bool IsInsideANullCheck(InvocationExpressionSyntax invocation, SemanticModel semanticModel, ISymbol symbol) =>
-            invocation.Ancestors().OfType<IfStatementSyntax>().Any(@if => IsConditionThatChecksForNotEqualsNull(@if.Condition, semanticModel, symbol));
+            invocation.Ancestors().OfType<IfStatementSyntax>().Any(@if =>
+                @if.Statement.Span.Contains(invocation.Span)
+                && IsConditionThatChecksForNotEqualsNull(@if.Condition, semanticModel, symbol));
 
         private static bool IsConditionThatChecksForNotEqualsNull(ExpressionSyntax condition, SemanticModel semanticModel, ISymbol symbol) =>
             IsConditionThatChecksForNull(condition, semanticModel, symbol, SyntaxKind.NotEqualsExpression);
@@ -116,6 +119,19 @@ namespace CodeCracker.CSharp.Design
         private static bool IsConditionThatChecksForNull(ExpressionSyntax condition, SemanticModel semanticModel, ISymbol symbol, SyntaxKind binarySyntaxKind)
         {
             if (condition == null) return false;
+            if (condition is IsPatternExpressionSyntax isPattern)
+            {
+                if (!isPattern.Expression.IsKind(SyntaxKind.IdentifierName)) return false;
+                var pattern = isPattern.Pattern;
+                if (binarySyntaxKind == SyntaxKind.NotEqualsExpression)
+                {
+                    if (!(pattern is UnaryPatternSyntax notPattern) || !notPattern.IsKind(SyntaxKind.NotPattern)) return false;
+                    pattern = notPattern.Pattern;
+                }
+                if (!(pattern is ConstantPatternSyntax constantPattern)
+                    || !constantPattern.Expression.IsKind(SyntaxKind.NullLiteralExpression)) return false;
+                return symbol.Equals(semanticModel.GetSymbolInfo(isPattern.Expression).Symbol);
+            }
             if (!condition.IsKind(binarySyntaxKind)) return false;
             var equals = (BinaryExpressionSyntax)condition;
             if (equals.Left == null || equals.Right == null) return false;

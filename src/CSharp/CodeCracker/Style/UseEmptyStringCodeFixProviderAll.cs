@@ -10,12 +10,19 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Applies fixes across a document, project, or solution to replace string.Empty references with empty string literals.
+    /// </summary>
     public sealed class UseEmptyStringCodeFixAllProvider : FixAllProvider
     {
         private static readonly SyntaxAnnotation useEmptyStringAnnotation = new SyntaxAnnotation(nameof(UseEmptyStringCodeFixAllProvider));
         private UseEmptyStringCodeFixAllProvider() { }
+        /// <summary>
+        /// The shared provider used to apply this code fix across a document, project, or solution.
+        /// </summary>
         public static readonly UseEmptyStringCodeFixAllProvider Instance = new UseEmptyStringCodeFixAllProvider();
 
+        /// <inheritdoc/>
         public override Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
         {
             switch (fixAllContext.Scope)

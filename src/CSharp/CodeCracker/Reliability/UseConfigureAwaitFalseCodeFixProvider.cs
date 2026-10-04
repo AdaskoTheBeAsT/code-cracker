@@ -13,13 +13,19 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace CodeCracker.CSharp.Reliability
 {
+    /// <summary>
+    /// Provides fixes to add ConfigureAwait(false) to eligible await expressions.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseConfigureAwaitFalseCodeFixProvider)), Shared]
     public class UseConfigureAwaitFalseCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.UseConfigureAwaitFalse.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

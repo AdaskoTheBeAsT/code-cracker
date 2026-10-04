@@ -12,13 +12,19 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to remove trailing whitespace.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RemoveTrailingWhitespaceCodeFixProvider)), Shared]
     public class RemoveTrailingWhitespaceCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.RemoveTrailingWhitespace.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -38,7 +44,9 @@ namespace CodeCracker.CSharp.Style
             else if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia, SyntaxKind.MultiLineDocumentationCommentTrivia, SyntaxKind.PragmaWarningDirectiveTrivia))
             {
                 var commentText = trivia.ToFullString();
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
                 var commentLines = commentText.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
                 var newComment = "";
                 var builder = new System.Text.StringBuilder();
                 builder.Append(newComment);
@@ -46,7 +54,9 @@ namespace CodeCracker.CSharp.Style
                 {
                     var commentLine = commentLines[i];
                     builder.Append(Regex.Replace(commentLine, @"\s+$", ""));
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
                     if (i < commentLines.Length - 1) builder.Append(Environment.NewLine);
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
                 }
                 newComment = builder.ToString();
                 newRoot = root.ReplaceTrivia(trivia, SyntaxFactory.SyntaxTrivia(SyntaxKind.DocumentationCommentExteriorTrivia, newComment));

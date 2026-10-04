@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports public constructors on abstract classes.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class AbstractClassShouldNotHavePublicCtorsAnalyzer : DiagnosticAnalyzer
     {
@@ -23,8 +26,10 @@ namespace CodeCracker.CSharp.Usage
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.AbstractClassShouldNotHavePublicCtors));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.ConstructorDeclaration);
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)

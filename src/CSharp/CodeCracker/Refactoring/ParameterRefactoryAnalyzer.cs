@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports methods with more than three parameters.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ParameterRefactoryAnalyzer : DiagnosticAnalyzer
     {
@@ -23,7 +26,9 @@ namespace CodeCracker.CSharp.Refactoring
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ParameterRefactory));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.MethodDeclaration);
 

@@ -7,6 +7,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports switch sections that can be wrapped in blocks.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class AddBracesToSwitchSectionsAnalyzer : DiagnosticAnalyzer
     {
@@ -23,8 +26,10 @@ namespace CodeCracker.CSharp.Refactoring
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.AddBracesToSwitchSections));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.SwitchStatement);
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)

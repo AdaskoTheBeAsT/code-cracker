@@ -16,14 +16,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to replace eligible field-backed properties with auto-properties.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SwitchToAutoPropCodeFixProvider)), Shared]
     public class SwitchToAutoPropCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.SwitchToAutoProp.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => SwitchToAutoPropCodeFixAllProvider.Instance;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -38,6 +44,14 @@ namespace CodeCracker.CSharp.Style
             return await MakeAutoPropertyAsync(document, root, property, cancellationToken);
         }
 
+        /// <summary>
+        /// Converts a field-backed property to an auto-property and redirects references from its removed backing field.
+        /// </summary>
+        /// <param name="document">The document containing the target syntax.</param>
+        /// <param name="root">The syntax root containing the target declaration or expression.</param>
+        /// <param name="property">The field-backed property to convert.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task returning the updated solution, including affected references.</returns>
         public async static Task<Solution> MakeAutoPropertyAsync(Document document, SyntaxNode root, PropertyDeclarationSyntax property, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);

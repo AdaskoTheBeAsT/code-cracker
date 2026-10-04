@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports for loops whose counting direction can be inverted.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class InvertForAnalyzer : DiagnosticAnalyzer
     {
@@ -22,8 +25,10 @@ namespace CodeCracker.CSharp.Refactoring
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.InvertFor));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.ForStatement);
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)

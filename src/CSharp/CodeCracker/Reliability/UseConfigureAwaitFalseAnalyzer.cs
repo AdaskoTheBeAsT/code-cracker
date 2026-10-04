@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Reliability
 {
+    /// <summary>
+    /// Reports await expressions that can use ConfigureAwait(false).
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UseConfigureAwaitFalseAnalyzer : DiagnosticAnalyzer
     {
@@ -22,8 +25,10 @@ namespace CodeCracker.CSharp.Reliability
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.UseConfigureAwaitFalse));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.AwaitExpression);
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)

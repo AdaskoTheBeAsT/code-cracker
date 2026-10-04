@@ -13,13 +13,19 @@ using System.Threading;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Provides fixes to wrap switch sections in blocks.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddBracesToSwitchSectionsCodeFixProvider)), Shared]
     public class AddBracesToSwitchSectionsCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.AddBracesToSwitchSections.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

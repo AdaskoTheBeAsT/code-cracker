@@ -7,6 +7,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports extension methods invoked using static-call syntax.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class CallExtensionMethodAsExtensionAnalyzer : DiagnosticAnalyzer
     {
@@ -23,8 +26,10 @@ namespace CodeCracker.CSharp.Usage
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.CallExtensionMethodAsExtension));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
@@ -202,7 +207,7 @@ namespace CodeCracker.CSharp.Usage
         /// Central compatibility: identity, implicit conversion, array↔IEnumerable&lt;T&gt; (with uninferred T support),
         /// type parameters, error symbols, interface implementation of IEnumerable&lt;T&gt;.
         /// </summary>
-        private static bool ArgumentMatchesParameter(ITypeSymbol? argType, ITypeSymbol paramType, SemanticModel model)
+        private static bool ArgumentMatchesParameter(ITypeSymbol argType, ITypeSymbol paramType, SemanticModel model)
         {
             if (argType == null || paramType == null) return false;
             if (argType.Kind == SymbolKind.ErrorType || paramType.Kind == SymbolKind.ErrorType) return true;

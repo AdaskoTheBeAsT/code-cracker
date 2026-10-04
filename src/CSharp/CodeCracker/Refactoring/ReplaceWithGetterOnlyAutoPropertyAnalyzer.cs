@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports properties that can be replaced with getter-only auto-properties.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ReplaceWithGetterOnlyAutoPropertyAnalyzer : DiagnosticAnalyzer
     {
@@ -26,8 +29,10 @@ namespace CodeCracker.CSharp.Refactoring
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ReplaceWithGetterOnlyAutoProperty));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.RegisterSymbolAction(LanguageVersion.CSharp6, AnalyzeSymbol, SymbolKind.Property);

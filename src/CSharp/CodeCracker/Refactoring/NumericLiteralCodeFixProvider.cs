@@ -12,14 +12,20 @@ using System.Threading.Tasks;
 namespace CodeCracker.CSharp.Refactoring
 {
 
+    /// <summary>
+    /// Provides fixes to convert numeric literals between decimal and hexadecimal representations.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NumericLiteralCodeFixProvider)), Shared]
     public class NumericLiteralCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.NumericLiteral.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

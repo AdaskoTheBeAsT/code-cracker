@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Design.InconsistentAccessibility
 {
+    /// <summary>
+    /// Provides fixes to adjust type accessibility to resolve inconsistent-accessibility compiler diagnostics.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(InconsistentAccessibilityCodeFixProvider)), Shared]
     public sealed class InconsistentAccessibilityCodeFixProvider : CodeFixProvider
     {
@@ -22,10 +25,13 @@ namespace CodeCracker.CSharp.Design.InconsistentAccessibility
         internal const string InconsistentAccessibilityInIndexerReturnTypeCompilerErrorNumber = "CS0054";
         internal const string InconsistentAccessibilityInIndexerParameterCompilerErrorNumber = "CS0055";
 
+        /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(InconsistentAccessibilityInMethodReturnTypeCompilerErrorNumber, InconsistentAccessibilityInMethodParameterCompilerErrorNumber, InconsistentAccessibilityInFieldTypeCompilerErrorNumber, InconsistentAccessibilityInPropertyTypeCompilerErrorNumber, InconsistentAccessibilityInIndexerReturnTypeCompilerErrorNumber, InconsistentAccessibilityInIndexerParameterCompilerErrorNumber);
 
+        /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             foreach (var diagnostic in context.Diagnostics)

@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Performance
 {
+    /// <summary>
+    /// Reports Where calls whose predicate can be passed directly to a subsequent LINQ operation.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class RemoveWhereWhenItIsPossibleAnalyzer : DiagnosticAnalyzer
     {
@@ -46,8 +49,10 @@ namespace CodeCracker.CSharp.Performance
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.RemoveWhereWhenItIsPossible));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.InvocationExpression);
 

@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Reports catch clauses without an explicit exception type.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class CatchEmptyAnalyzer : DiagnosticAnalyzer
     {
@@ -22,8 +25,10 @@ namespace CodeCracker.CSharp.Design
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.CatchEmpty));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.CatchClause);
 

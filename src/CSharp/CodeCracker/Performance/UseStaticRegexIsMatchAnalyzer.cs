@@ -6,6 +6,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Performance
 {
+    /// <summary>
+    /// Reports IsMatch calls on local Regex variables that can use the static API.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UseStaticRegexIsMatchAnalyzer : DiagnosticAnalyzer
     {
@@ -25,8 +28,10 @@ namespace CodeCracker.CSharp.Performance
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.UseStaticRegexIsMatch));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.InvocationExpression);
 

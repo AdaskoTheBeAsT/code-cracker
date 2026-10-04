@@ -11,16 +11,25 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Style
 {
+    /// <summary>
+    /// Provides fixes to replace string.Empty references with empty string literals.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseEmptyStringCodeFixProvider)), Shared]
     public class UseEmptyStringCodeFixProvider : CodeFixProvider
     {
         private const string EmptyString = "\"\"";
+        /// <summary>
+        /// The code action title for replacing string.Empty with an empty string literal.
+        /// </summary>
         public const string MessageFormat = "Use " + EmptyString;
 
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.UseEmptyString.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => UseEmptyStringCodeFixAllProvider.Instance;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

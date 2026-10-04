@@ -13,14 +13,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to remove unused parameters and their corresponding call-site arguments.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UnusedParametersCodeFixProvider)), Shared]
     public class UnusedParametersCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.UnusedParameters.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => UnusedParametersCodeFixAllProvider.Instance;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -29,6 +35,13 @@ namespace CodeCracker.CSharp.Usage
             return Task.FromResult(0);
         }
 
+        /// <summary>
+        /// Removes an unused parameter from its declaration and the corresponding arguments from call sites in the solution.
+        /// </summary>
+        /// <param name="document">The document containing the target syntax.</param>
+        /// <param name="diagnostic">The diagnostic identifying the target declaration or expression.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task returning the updated solution.</returns>
         public async static Task<Solution> RemoveParameterAsync(Document document, Diagnostic diagnostic, CancellationToken cancellationToken)
         {
             var solution = document.Project.Solution;
@@ -41,6 +54,14 @@ namespace CodeCracker.CSharp.Usage
             return newSolution;
         }
 
+        /// <summary>
+        /// Removes an unused parameter from its declaration and the corresponding arguments from call sites in the solution.
+        /// </summary>
+        /// <param name="document">The document containing the target syntax.</param>
+        /// <param name="parameter">The parameter to transform.</param>
+        /// <param name="root">The syntax root containing the target declaration or expression.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task returning the updated syntax roots and document identifiers for the declaration and affected call sites.</returns>
         public async static Task<List<DocumentIdAndRoot>> RemoveParameterAsync(Document document, ParameterSyntax parameter, SyntaxNode root, CancellationToken cancellationToken)
         {
             var solution = document.Project.Solution;
@@ -114,6 +135,9 @@ namespace CodeCracker.CSharp.Usage
             }
             return docs;
         }
+        /// <summary>
+        /// Associates an updated syntax root with the document to which it belongs.
+        /// </summary>
         public struct DocumentIdAndRoot
         {
             internal DocumentId DocumentId;

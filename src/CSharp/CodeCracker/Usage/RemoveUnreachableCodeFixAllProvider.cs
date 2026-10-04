@@ -6,11 +6,18 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Removes compiler-reported unreachable code across a document, project, or solution.
+    /// </summary>
     public sealed class RemoveUnreachableCodeFixAllProvider : FixAllProvider
     {
         private static readonly SyntaxAnnotation removeUnreachableCodeAnnotation = new SyntaxAnnotation(nameof(RemoveUnreachableCodeFixAllProvider));
         private RemoveUnreachableCodeFixAllProvider() { }
+        /// <summary>
+        /// The shared provider used to apply this code fix across a document, project, or solution.
+        /// </summary>
         public static readonly RemoveUnreachableCodeFixAllProvider Instance = new RemoveUnreachableCodeFixAllProvider();
+        /// <inheritdoc/>
         public override Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
         {
             switch (fixAllContext.Scope)

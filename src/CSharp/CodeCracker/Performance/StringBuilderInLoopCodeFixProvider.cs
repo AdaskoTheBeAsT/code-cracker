@@ -13,14 +13,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Provides fixes to replace repeated string concatenation in loops with a StringBuilder.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StringBuilderInLoopCodeFixProvider)), Shared]
     public class StringBuilderInLoopCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.StringBuilderInLoop.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => null; //todo: allow for a fixall but only if we can fix the clash on the builder name in a nice way
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

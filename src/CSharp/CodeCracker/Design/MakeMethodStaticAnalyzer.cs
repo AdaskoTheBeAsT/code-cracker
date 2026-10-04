@@ -7,6 +7,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Reports methods that do not use instance members and can be made static.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class MakeMethodStaticAnalyzer : DiagnosticAnalyzer
     {
@@ -27,8 +30,10 @@ namespace CodeCracker.CSharp.Design
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.MakeMethodStatic));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(LanguageVersion.CSharp6, AnalyzeMethod, SyntaxKind.MethodDeclaration);
 

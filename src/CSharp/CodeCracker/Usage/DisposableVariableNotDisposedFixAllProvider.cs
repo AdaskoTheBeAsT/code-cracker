@@ -7,11 +7,18 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Applies fixes across a document, project, or solution to ensure disposal of created disposable objects.
+    /// </summary>
     public sealed class DisposableVariableNotDisposedFixAllProvider : FixAllProvider
     {
         private static readonly SyntaxAnnotation disposeAnnotation = new SyntaxAnnotation(nameof(DisposableVariableNotDisposedFixAllProvider));
         private DisposableVariableNotDisposedFixAllProvider() { }
+        /// <summary>
+        /// The shared provider used to apply this code fix across a document, project, or solution.
+        /// </summary>
         public static readonly DisposableVariableNotDisposedFixAllProvider Instance = new DisposableVariableNotDisposedFixAllProvider();
+        /// <inheritdoc/>
         public override Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
         {
             switch (fixAllContext.Scope)

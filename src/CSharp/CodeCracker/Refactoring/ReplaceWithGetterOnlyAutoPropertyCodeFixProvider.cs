@@ -16,14 +16,20 @@ using CodeCracker.FixAllProviders;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Provides fixes to replace eligible properties and backing fields with getter-only auto-properties.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ReplaceWithGetterOnlyAutoPropertyCodeFixProvider)), Shared]
     public class ReplaceWithGetterOnlyAutoPropertyCodeFixProvider : CodeFixProvider, IFixDocumentInternalsOnly
     {
         private static readonly FixAllProvider FixAllProvider = new DocumentCodeFixProviderAll(Resources.ReplaceWithGetterOnlyAutoPropertyCodeFixProvider_Title);
+        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.ReplaceWithGetterOnlyAutoProperty.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => FixAllProvider;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();
@@ -44,6 +50,13 @@ namespace CodeCracker.CSharp.Refactoring
             return await FixDocumentAsync(node, document, cancellationToken).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Replaces the identified field-backed property with a getter-only auto-property and updates references in the document.
+        /// </summary>
+        /// <param name="nodeWithDiagnostic">The property declaration or a node within it.</param>
+        /// <param name="document">The document containing the property and its backing field.</param>
+        /// <param name="cancellationToken">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task returning the updated document, or an unchanged document if no backing field is found.</returns>
         public async Task<Document> FixDocumentAsync(SyntaxNode nodeWithDiagnostic, Document document, CancellationToken cancellationToken)
         {
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
@@ -77,7 +90,7 @@ namespace CodeCracker.CSharp.Refactoring
                 newRoot = newRoot.ReplaceNode(trackedIdentifierNode, newIdentifierExpression);
             }
             var prop = newRoot.GetCurrentNode(nodesToUpdate.OfType<PropertyDeclarationSyntax>().Single());
-            var fieldInitilization = GetFieldInitialization(fieldVariableDeclaratorSyntax);
+            var fieldInitilization = fieldVariableDeclaratorSyntax.Initializer;
             var getter = SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration).WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
             var accessorList = SyntaxFactory.AccessorList(
                 SyntaxFactory.List(new[] {
@@ -98,18 +111,6 @@ namespace CodeCracker.CSharp.Refactoring
             else
                 newRoot = newRoot.RemoveNode(variableDeclarator, SyntaxRemoveOptions.KeepUnbalancedDirectives);
             return newRoot;
-        }
-
-        private static EqualsValueClauseSyntax GetFieldInitialization(VariableDeclaratorSyntax fieldVariableDeclaratorSyntax)
-        {
-            var declaration = fieldVariableDeclaratorSyntax.AncestorsAndSelf().OfType<VariableDeclarationSyntax>().First();
-            if (declaration == null)
-                return null;
-            var variableWithPotentialInitializer = declaration.Variables.SkipWhile(v => v != fieldVariableDeclaratorSyntax).FirstOrDefault(v => v.Initializer != null);
-            if (variableWithPotentialInitializer == null)
-                return null;
-            var initializer = variableWithPotentialInitializer.Initializer;
-            return initializer;
         }
 
         private static async Task<IEnumerable<IdentifierNameSyntax>> GetFieldReferencesAsync(VariableDeclaratorSyntax fieldDeclarationSyntax, CancellationToken cancellationToken, SemanticModel semanticModel)

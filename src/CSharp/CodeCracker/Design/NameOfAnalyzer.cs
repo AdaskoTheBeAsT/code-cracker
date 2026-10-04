@@ -9,6 +9,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Reports string literals that can be replaced with a nameof expression.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class NameOfAnalyzer : DiagnosticAnalyzer
     {
@@ -35,8 +38,10 @@ namespace CodeCracker.CSharp.Design
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.NameOf_External));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule, RuleExternal);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(LanguageVersion.CSharp6, Analyze, SyntaxKind.StringLiteralExpression);
 

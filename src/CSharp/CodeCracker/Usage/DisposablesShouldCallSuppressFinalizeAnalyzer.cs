@@ -7,6 +7,9 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports disposable types whose Dispose method should suppress finalization.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DisposablesShouldCallSuppressFinalizeAnalyzer : DiagnosticAnalyzer
     {
@@ -26,8 +29,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.DisposablesShouldCallSuppressFinalize));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(LanguageVersion.CSharp6, Analyze, SyntaxKind.MethodDeclaration);
 
@@ -76,12 +81,22 @@ namespace CodeCracker.CSharp.Usage
             context.ReportDiagnostic(Diagnostic.Create(Rule, methodSymbol.Locations[0], symbol.Name));
         }
 
+        /// <summary>
+        /// Checks whether a type declares a user-defined finalizer.
+        /// </summary>
+        /// <param name="symbol">The type symbol to inspect.</param>
+        /// <returns>True if a declared finalizer is found; otherwise, false.</returns>
         public static bool ContainsUserDefinedFinalizer(INamedTypeSymbol symbol)
         {
             return symbol.GetMembers()
                 .Any(x => x.ToString().Contains($".~{x.ContainingType.Name}("));
         }
 
+        /// <summary>
+        /// Checks for nonprivate instance constructors, excluding types nested with private accessibility.
+        /// </summary>
+        /// <param name="symbol">The type symbol to inspect.</param>
+        /// <returns>True if the type is not privately nested and declares a nonprivate instance constructor; otherwise, false.</returns>
         public static bool ContainsNonPrivateConstructors(INamedTypeSymbol symbol)
         {
             if (IsNestedPrivateType(symbol))

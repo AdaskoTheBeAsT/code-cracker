@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace CodeCracker.CSharp.Refactoring
 {
+    /// <summary>
+    /// Reports Any and All calls that support conversion to the complementary operation.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ChangeAnyToAllAnalyzer : DiagnosticAnalyzer
     {
@@ -35,11 +38,19 @@ namespace CodeCracker.CSharp.Refactoring
             isEnabledByDefault: true,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.ChangeAllToAny));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(RuleAny, RuleAll);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
 
+        /// <summary>
+        /// The reusable simple-name syntax for the All member.
+        /// </summary>
         public static readonly SimpleNameSyntax allName = (SimpleNameSyntax)SyntaxFactory.ParseName("All");
+        /// <summary>
+        /// The reusable simple-name syntax for the Any member.
+        /// </summary>
         public static readonly SimpleNameSyntax anyName = (SimpleNameSyntax)SyntaxFactory.ParseName("Any");
 
         private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
@@ -67,6 +78,11 @@ namespace CodeCracker.CSharp.Refactoring
             return methodNameText == "Any" ? RuleAny : RuleAll;
         }
 
+        /// <summary>
+        /// Gets the member name from an invocation using member access or conditional member binding.
+        /// </summary>
+        /// <param name="invocation">The invocation whose member access or member binding is inspected.</param>
+        /// <returns>The invocation's member name, or null for an unsupported expression kind.</returns>
         public static SimpleNameSyntax GetName(InvocationExpressionSyntax invocation)
         {
             SimpleNameSyntax methodName = null;
@@ -108,6 +124,12 @@ namespace CodeCracker.CSharp.Refactoring
             return speculativeModel.GetSymbolInfo(annotatedNode).Symbol != null;
         }
 
+        /// <summary>
+        /// Replaces an invocation's accessed member name and annotates the expression for speculative binding.
+        /// </summary>
+        /// <param name="invocation">The invocation whose member access or member binding is inspected.</param>
+        /// <param name="nameToCheck">The replacement member name.</param>
+        /// <returns>The annotated member-access or member-binding expression with the replacement name.</returns>
         public static ExpressionSyntax CreateExpressionWithNewName(InvocationExpressionSyntax invocation, SimpleNameSyntax nameToCheck)
         {
             var otherExpression = invocation.Expression.IsKind(SyntaxKind.MemberBindingExpression)

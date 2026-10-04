@@ -10,14 +10,20 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Provides fixes to remove throw statements from static constructors.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StaticConstructorExceptionCodeFixProvider)), Shared]
     public class StaticConstructorExceptionCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.StaticConstructorException.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

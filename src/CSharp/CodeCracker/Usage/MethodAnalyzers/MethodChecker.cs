@@ -7,17 +7,29 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CodeCracker.CSharp.Usage.MethodAnalyzers
 {
+    /// <summary>
+    /// Validates constant arguments of matching method and constructor calls and reports validation exceptions as diagnostics.
+    /// </summary>
     public class MethodChecker
     {
         private readonly SyntaxNodeAnalysisContext context;
         private readonly DiagnosticDescriptor diagnosticDescriptor;
 
+        /// <summary>
+        /// Initializes a checker with an analysis context and a diagnostic descriptor for validation failures.
+        /// </summary>
+        /// <param name="context">The analysis context for the target syntax or symbol.</param>
+        /// <param name="diagnosticDescriptor">The descriptor reported when argument validation throws an exception.</param>
         public MethodChecker(SyntaxNodeAnalysisContext context, DiagnosticDescriptor diagnosticDescriptor)
         {
             this.context = context;
             this.diagnosticDescriptor = diagnosticDescriptor;
         }
 
+        /// <summary>
+        /// Validates constant arguments when the analysis context's object creation matches the target constructor signature.
+        /// </summary>
+        /// <param name="methodInformation">The target signature, argument validator, and diagnostic location index.</param>
         public void AnalyzeConstructor(MethodInformation methodInformation)
         {
             if (ConstructorNameNotFound(methodInformation) || MethodFullNameNotFound(methodInformation.MethodFullDefinition))
@@ -46,6 +58,10 @@ namespace CodeCracker.CSharp.Usage.MethodAnalyzers
             return identifier?.Right.ToString() != methodInformation.MethodName;
         }
 
+        /// <summary>
+        /// Validates constant arguments when the analysis context's invocation matches the target method signature.
+        /// </summary>
+        /// <param name="methodInformation">The target signature, argument validator, and diagnostic location index.</param>
         public void AnalyzeMethod(MethodInformation methodInformation)
         {
             if (MethodNameNotFound(methodInformation) ||

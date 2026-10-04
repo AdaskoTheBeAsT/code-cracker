@@ -12,15 +12,21 @@ using System.Threading.Tasks;
 namespace CodeCracker.CSharp.Refactoring
 {
 
+    /// <summary>
+    /// Provides fixes to replace constant expressions with their computed values.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ComputeExpressionCodeFixProvider)), Shared]
     public class ComputeExpressionCodeFixProvider : CodeFixProvider
     {
 
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.ComputeExpression.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

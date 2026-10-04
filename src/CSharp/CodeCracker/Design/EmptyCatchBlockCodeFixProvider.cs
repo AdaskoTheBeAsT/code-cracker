@@ -13,6 +13,9 @@ using CodeCracker.Properties;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Provides fixes to remove or document empty exception handlers.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(EmptyCatchBlockCodeFixProvider)), Shared]
     public class EmptyCatchBlockCodeFixProvider : CodeFixProvider
     {
@@ -21,11 +24,14 @@ namespace CodeCracker.CSharp.Design
         internal static readonly LocalizableString FixInsertExceptionClass = new LocalizableResourceString(nameof(Resources.EmptyCatchBlockCodeFixProvider_InsertException), Resources.ResourceManager, typeof(Resources));
         internal static readonly LocalizableString FixRemoveTry = new LocalizableResourceString(nameof(Resources.EmptyCatchBlockCodeFixProvider_RemoveTry), Resources.ResourceManager, typeof(Resources));
 
+        /// <inheritdoc/>
         public sealed override ImmutableArray<string> FixableDiagnosticIds =>
             ImmutableArray.Create(DiagnosticId.EmptyCatchBlock.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

@@ -7,6 +7,9 @@ using System.Collections.Immutable;
 
 namespace CodeCracker.CSharp.Usage
 {
+    /// <summary>
+    /// Reports invalid constant URI strings passed to URI APIs.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UriAnalyzer : DiagnosticAnalyzer
     {
@@ -27,8 +30,10 @@ namespace CodeCracker.CSharp.Usage
             description: Description,
             helpLinkUri: HelpLink.ForDiagnostic(DiagnosticId.Uri));
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(Analyzer, SyntaxKind.ObjectCreationExpression);
 
         private static void Analyzer(SyntaxNodeAnalysisContext context)

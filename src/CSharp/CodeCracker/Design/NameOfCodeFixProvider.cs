@@ -13,13 +13,19 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Design
 {
+    /// <summary>
+    /// Provides fixes to replace eligible string literals with nameof expressions.
+    /// </summary>
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NameOfCodeFixProvider)), Shared]
     public class NameOfCodeFixProvider : CodeFixProvider
     {
+        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId.NameOf.ToDiagnosticId(), DiagnosticId.NameOf_External.ToDiagnosticId());
 
+        /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+        /// <inheritdoc/>
         public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var diagnostic = context.Diagnostics.First();

@@ -10,10 +10,26 @@ using System.Threading.Tasks;
 
 namespace CodeCracker.CSharp.Maintainability
 {
+    /// <summary>
+    /// Provides shared helpers for reconciling method parameters with XML parameter documentation.
+    /// </summary>
     public abstract class XmlDocumentationCodeFixProvider : CodeFixProvider
     {
+        /// <summary>
+        /// Reconciles XML parameter entries with the method's parameters using the derived provider's repair strategy.
+        /// </summary>
+        /// <param name="method">The method whose parameter documentation is being reconciled.</param>
+        /// <param name="root">The syntax root containing the target declaration or expression.</param>
+        /// <returns>The syntax root with the method's parameter documentation repaired.</returns>
         public abstract SyntaxNode FixParameters(MethodDeclarationSyntax method, SyntaxNode root);
 
+        /// <summary>
+        /// Locates the diagnosed method and applies the provider's XML parameter documentation repair.
+        /// </summary>
+        /// <param name="document">The document containing the target syntax.</param>
+        /// <param name="diagnostic">The diagnostic identifying the target declaration or expression.</param>
+        /// <param name="c">The token used to cancel the asynchronous operation.</param>
+        /// <returns>A task returning the document with repaired parameter documentation.</returns>
         protected async Task<Document> FixParametersAsync(Document document, Diagnostic diagnostic, CancellationToken c)
         {
             var root = await document.GetSyntaxRootAsync(c).ConfigureAwait(false);
@@ -23,6 +39,12 @@ namespace CodeCracker.CSharp.Maintainability
             return newDocument;
         }
 
+        /// <summary>
+        /// Pairs method parameters with XML parameter entries by name, including names present on only one side.
+        /// </summary>
+        /// <param name="method">The method whose parameter documentation is being reconciled.</param>
+        /// <param name="documentationNode">The method's XML documentation comment.</param>
+        /// <returns>Pairs containing a parameter and its XML element and name attribute; either side is null when absent.</returns>
         protected static IEnumerable<Tuple<ParameterSyntax, Tuple<XmlElementSyntax, XmlNameAttributeSyntax>>> GetMethodParametersWithDocParameters(MethodDeclarationSyntax method, DocumentationCommentTriviaSyntax documentationNode)
         {
             var methodParameters = method.ParameterList.Parameters;

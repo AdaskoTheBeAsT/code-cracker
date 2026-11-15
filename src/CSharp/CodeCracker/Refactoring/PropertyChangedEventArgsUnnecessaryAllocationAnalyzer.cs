@@ -52,6 +52,7 @@ namespace CodeCracker.CSharp.Refactoring
 
         private static void PropertyChangedCreation(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsGenerated()) return;
             var propertyChangedEventArgsCreationExpr = (ObjectCreationExpressionSyntax)context.Node;
             var identifier = propertyChangedEventArgsCreationExpr.Type.Accept(ExtractIdentifier);
             if (ShouldReportDiagnostic(propertyChangedEventArgsCreationExpr, identifier.ValueText))
@@ -64,6 +65,7 @@ namespace CodeCracker.CSharp.Refactoring
 
         private static bool ShouldReportDiagnostic(ObjectCreationExpressionSyntax propertyChangedExpr, string identifierName) =>
                 IsPropertyChangedEventArgs(identifierName)
+                && propertyChangedExpr.ArgumentList != null
                 && propertyChangedExpr.ArgumentList.Accept(IsAnyArgumentLiteralOrNameof)
                 && !IsAlreadyStatic(propertyChangedExpr);
 
@@ -99,7 +101,7 @@ namespace CodeCracker.CSharp.Refactoring
         private class IdentifierExtractor : CSharpSyntaxVisitor<SyntaxToken>
         {
             public override SyntaxToken VisitIdentifierName(IdentifierNameSyntax node) => node.Identifier;
-            public override SyntaxToken VisitQualifiedName(QualifiedNameSyntax node) => VisitIdentifierName((IdentifierNameSyntax)node.Right);
+            public override SyntaxToken VisitQualifiedName(QualifiedNameSyntax node) => node.Right.Accept(this);
         }
 
         private class IsArgumentALiteralOrNameof : CSharpSyntaxVisitor<bool>
